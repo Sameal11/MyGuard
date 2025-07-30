@@ -1,29 +1,28 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import 'react-native-reanimated';
+import { Stack, useRouter } from "expo-router";
+import { Text, View } from "react-native";
+import { useEffect}from "react"; 
 
-import { useColorScheme } from '@/hooks/useColorScheme';
+function RouteGuard({children}:{children: React.ReactNode}) {
+  
+  const router=useRouter();
+  const isAuthenticated = false; // Replace with actual authentication logic
+  
+  useEffect(()=>{
+    if(!isAuthenticated){
+      router.replace("/auth");
+    }
+  });
+  
+  return<>{children}</>
+}
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
-  const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-  });
-
-  if (!loaded) {
-    // Async font loading only occurs in development.
-    return null;
-  }
-
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+    <RouteGuard>
       <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
+        {/* <Stack.Screen name ="index" options={{title: 'Home'}} /> */}
+        <Stack.Screen name="auth" options={{title: 'Login '}} />
       </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
+    </RouteGuard>
   );
 }
