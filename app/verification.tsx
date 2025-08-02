@@ -1,11 +1,14 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, TextInput, Image, Button, Platform } from 'react-native';
-import * as DocumentPicker from 'expo-document-picker';
-import { Picker } from '@react-native-picker/picker';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import RNPickerSelect from 'react-native-picker-select';
+import * as DocumentPicker from 'expo-document-picker';
 import { router } from 'expo-router';
+import React, { useState } from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { documentTypes } from '../lib/testData';
+import { useUser } from '../lib/userContext';
 
 export default function UploadIdScreen() {
+  const { currentUser, setCurrentUser } = useUser();
   const [documentType, setDocumentType] = useState('');
   const [selectedFile, setSelectedFile] = useState<DocumentPicker.DocumentPickerAsset | null>(null);
   const [status, setStatus] = useState<'idle' | 'submitting' |'waiting' | 'approved' | 'rejected'>('idle');
@@ -31,13 +34,17 @@ export default function UploadIdScreen() {
         setStatus('waiting'); // Simulate that it is now waiting for admin review
 
         // Simulate admin decision after 5 seconds
-        setTimeout(() => {
-        const approved = Math.random() > 0.5; // Randomly approve or reject
-        if(approved){
-          router.push('/Screens/home');
-        }
-        setStatus(approved ? 'approved' : 'rejected');
-        }, 5000); // Admin takes 5s to approve/reject
+setTimeout(() => {
+    const approved = Math.random() > 0.5; // Randomly approve or reject
+    if(approved && currentUser){
+      // Update user verification status
+      const updatedUser = { ...currentUser, isVerified: true };
+      setCurrentUser(updatedUser);
+      // Navigate to home - it will show the appropriate interface based on userType
+      router.push('/(tab)/home');
+    }
+    // setStatus(approved ? 'approved' : 'rejected');
+    }, 5000); // Admin takes 5s to approve/reject
 
     }, 2000); // Upload takes 2s
     };
@@ -49,8 +56,8 @@ export default function UploadIdScreen() {
       <View style={styles.profileRow}>
         <View style={styles.avatarCircle} />
         <TouchableOpacity style={styles.nameButton}>
-          <Text style={styles.name}>Anuj Munda</Text>
-          <Text style={styles.plot}>Plot-101</Text>
+          <Text style={styles.name}>{currentUser?.name || 'User'}</Text>
+          <Text style={styles.plot}>{currentUser?.plotNumber || 'N/A'}</Text>
         </TouchableOpacity>
         <TouchableOpacity  >
             <MaterialIcons name="settings" size={50} color="black"  style={{marginLeft: 25,}} />
@@ -60,18 +67,19 @@ export default function UploadIdScreen() {
       <Text style={styles.instruction}>To complete the profile upload Any government issued ID</Text>
 
       {/* Dropdown simulation */}
-      <Picker
-        selectedValue={documentType}
-        onValueChange={(itemValue) => setDocumentType(itemValue)}
-        style={{ ...styles.dropdown, height: 50, borderRadius:30 ,backgroundColor: 'white' }}
-        >
-            <Picker.Item label="Select Document Type" value="" />
-            <Picker.Item label="Aadhar Card" value="aadhar" />
-            <Picker.Item label="Pan Card" value="pan" />
-            <Picker.Item label="Voter ID" value="voter" />
-            <Picker.Item label="Driving License" value="license" />
-            <Picker.Item label="Passport" value="passport" />
-        </Picker>
+      <RNPickerSelect
+        onValueChange={(value) => setDocumentType(value)}
+        items={documentTypes}
+        placeholder={{
+          label: 'Select Document Type',
+          value: null,
+        }}
+        style={{
+          inputIOS: styles.dropdown,
+          inputAndroid: styles.dropdown,
+        }}
+        value={documentType}
+      />
       
 
       {/* Upload box */}

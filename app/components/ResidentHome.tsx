@@ -1,16 +1,14 @@
-// components/GuardHome.tsx
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Image } from 'react-native';
+// components/ResidentHome.tsx
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { useRouter } from 'expo-router';
+import React from 'react';
+import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { testVisitors, testNotices } from '../../lib/testData';
 
-export default function GuardHome() {
-  const visitors = [
-    { name: 'John Doe', image: 'https://via.placeholder.com/60' },
-    { name: 'Jane Smith', image: 'https://via.placeholder.com/60' },
-    { name: 'Alice Johnson', image: 'https://via.placeholder.com/60' },
-    { name: 'Bob Brown', image: 'https://via.placeholder.com/60' },
-    { name: 'Plumber', image: 'https://via.placeholder.com/60' },
-  ];
+export default function ResidentHome() {
+  const router = useRouter();
+  const visitors = testVisitors;
+  const notices = testNotices;
 
   return (
     <View style={styles.container}>
@@ -21,7 +19,7 @@ export default function GuardHome() {
           <Text style={styles.name}>Anuj Munda</Text>
           <Text style={styles.area}>Plot-101</Text>
         </TouchableOpacity>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => router.push('/settings')}>
           <MaterialIcons name="settings" size={32} color="black" style={styles.settingsIcon} />
         </TouchableOpacity>
       </View>
@@ -30,9 +28,9 @@ export default function GuardHome() {
       <View style={styles.overlay}>
         {/* Notice */}
         <View style={styles.noticeBox}>
-          <Text style={styles.noticeTitle}>Notice</Text>
+          <Text style={styles.noticeTitle}>{notices[0]?.title || 'Notice'}</Text>
           <Text style={styles.noticeText}>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore.
+            {notices[0]?.content || 'No notices available at the moment.'}
           </Text>
         </View>
 
@@ -47,7 +45,7 @@ export default function GuardHome() {
               </View>
             ))}
             {visitors.length > 4 && (
-              <TouchableOpacity style={styles.moreItem} onPress={() => console.log("View more visitors")}>
+              <TouchableOpacity style={styles.moreItem} onPress={() => router.push('/(tab)/visitor-management')}>
                 <MaterialIcons name="navigate-next" size={40} color="black" />
                 <Text style={styles.visitorName}>More</Text>
               </TouchableOpacity>
@@ -110,7 +108,7 @@ const styles = StyleSheet.create({
 
   overlay: {
     backgroundColor: 'rgba(57, 174, 228, 0.8)',
-    padding: 20,
+    padding: 3,
     borderRadius: 20,
     flex: 1,
   },
@@ -118,7 +116,7 @@ const styles = StyleSheet.create({
   noticeBox: {
     backgroundColor: '#2F3A45',
     borderRadius: 15,
-    padding: 15,
+    padding: 0,
     marginBottom: 25,
     height: 150,
   },
@@ -128,17 +126,21 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 5,
+    padding:3,
+    marginLeft: 10,
   },
 
   noticeText: {
     color: '#e0e0e0',
     fontSize: 14,
+    marginLeft: 10,
   },
 
   visitorLogContainer: {
     marginTop: 10,
     backgroundColor: '#fff',
     borderRadius: 10,
+    padding:1,
   },
 
   sectionTitle: {
@@ -146,6 +148,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#000',
     marginBottom: 10,
+    marginLeft: 10,
   },
 
   scrollRow: {
