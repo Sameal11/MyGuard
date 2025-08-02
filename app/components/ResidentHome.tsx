@@ -1,4 +1,5 @@
 // components/ResidentHome.tsx
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useRouter } from 'expo-router';
 import React from 'react';
@@ -20,7 +21,7 @@ export default function ResidentHome() {
           <Text style={styles.area}>Plot-101</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => router.push('/settings')}>
-          <MaterialIcons name="settings" size={32} color="black" style={styles.settingsIcon} />
+          <MaterialCommunityIcons name="alert-decagram" size={32} color="black" />
         </TouchableOpacity>
       </View>
 
@@ -51,6 +52,35 @@ export default function ResidentHome() {
               </TouchableOpacity>
             )}
           </ScrollView>
+        </View>
+        <View style={styles.sections}>
+          <Text style={styles.sectionTitles}>Quick Actions</Text>
+          <TouchableOpacity 
+            style={styles.quickActionButton}
+            onPress={() => router.push('/pre-approve-visitor')}
+          >
+            <MaterialIcons name="person-add" size={24} color="#007AFF" />
+            <Text style={styles.quickActionText}>Pre-approve Visitor</Text>
+            <MaterialIcons name="chevron-right" size={24} color="#007AFF" />
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+            style={styles.quickActionButton}
+            onPress={() => router.push('/visitor-history')}
+          >
+            <MaterialIcons name="history" size={24} color="#007AFF" />
+            <Text style={styles.quickActionText}>Visitor History</Text>
+            <MaterialIcons name="chevron-right" size={24} color="#007AFF" />
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+            style={styles.quickActionButton}
+            onPress={() => router.push('/vehicle-management')}
+          >
+            <MaterialIcons name="directions-car" size={24} color="#007AFF" />
+            <Text style={styles.quickActionText}>Vehicle History</Text>
+            <MaterialIcons name="chevron-right" size={24} color="#007AFF" />
+          </TouchableOpacity>
         </View>
       </View>
     </View>
@@ -179,5 +209,37 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginLeft: 10,
+  },
+  sections: {
+    marginBottom: 30,
+  },
+  sectionTitles: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#000',
+    marginBottom: 15,
+    marginTop: 10,
+  },
+  quickActionButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 15,
+    marginBottom: 10,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  quickActionText: {
+    flex: 1,
+    fontSize: 16,
+    color: '#000',
+    marginLeft: 15,
   },
 });

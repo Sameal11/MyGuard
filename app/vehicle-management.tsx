@@ -10,13 +10,13 @@ export default function VehicleManagementScreen() {
   return (
     <View style={styles.container}>
       {/* Header */}
-      <View style={styles.header}>
+      {/* <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <MaterialIcons name="arrow-back" size={24} color="#000" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Vehicle Management</Text>
         <View style={styles.placeholder} />
-      </View>
+      </View> */}
 
       <ScrollView style={styles.content}>
         <Text style={styles.sectionTitle}>Registered Vehicles</Text>

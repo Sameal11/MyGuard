@@ -15,6 +15,8 @@ import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useRouter } from 'expo-router';
 import { testVisitors } from '../../lib/testData';
 import { useUser } from '../../lib/userContext';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import { BarCodeScanner } from 'expo-barcode-scanner';
 
 export default function GuardHome() {
   const router = useRouter();
@@ -29,8 +31,8 @@ export default function GuardHome() {
           <Text style={styles.name}>{currentUser?.name || 'Guard'}</Text>
           <Text style={styles.area}>{currentUser?.plotNumber || 'Area'}</Text>
         </TouchableOpacity>
-        <TouchableOpacity  >
-            <MaterialIcons name="settings" size={50} color="black"  style={{marginLeft: 25,}} />
+        <TouchableOpacity onPress={() => router.push('/scanner')}>
+            <MaterialCommunityIcons name="line-scan" size={50} color="black"  style={{marginLeft: 25,}} />
         </TouchableOpacity>
       </View>
 
@@ -46,7 +48,7 @@ export default function GuardHome() {
         <View style={styles.categories}>
           {
             [
-              { id: 'courier', label: 'Courier', screen: '/courier-entry' },
+              { id: 'courier', label: 'Courier', screen: '/courier-entry' ,icon: <MaterialCommunityIcons name="truck-delivery" size={24} color="black" />, },
               { id: 'cab', label: 'Cab/Taxi', screen: '/taxi-entry' },
               { id: 'office', label: 'Office', screen: '/office-visitor-entry' },
               { id: 'construction', label: 'Construction', screen: '/construction-entry' },
@@ -60,6 +62,36 @@ export default function GuardHome() {
               </TouchableOpacity>
             ))
           }
+        </View>
+        {/* Quick Actions */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Quick Actions</Text>
+          <TouchableOpacity 
+            style={styles.quickActionButton}
+            onPress={() => router.push('/pre-approve-visitor')}
+          >
+            <MaterialIcons name="person-add" size={24} color="#007AFF" />
+            <Text style={styles.quickActionText}>Pre-approve Visitor</Text>
+            <MaterialIcons name="chevron-right" size={24} color="#007AFF" />
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+            style={styles.quickActionButton}
+            onPress={() => router.push('/visitor-history')}
+          >
+            <MaterialIcons name="history" size={24} color="#007AFF" />
+            <Text style={styles.quickActionText}>Visitor History</Text>
+            <MaterialIcons name="chevron-right" size={24} color="#007AFF" />
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+            style={styles.quickActionButton}
+            onPress={() => router.push('/vehicle-management')}
+          >
+            <MaterialIcons name="directions-car" size={24} color="#007AFF" />
+            <Text style={styles.quickActionText}>Vehicle Management</Text>
+            <MaterialIcons name="chevron-right" size={24} color="#007AFF" />
+          </TouchableOpacity>
         </View>
       </View>
 
@@ -80,12 +112,19 @@ const styles = StyleSheet.create({
   noticeText: { color: '#fff' },
   categories: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, justifyContent: 'space-around' },
   categoryButton: {
-    backgroundColor: '#C6FFFF',
+    backgroundColor: '#fff',
     padding: 20,
     width: '45%',
     alignItems: 'center',
     marginVertical: 5,
-    borderRadius: 10
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,},
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   overlay: {
     
@@ -96,5 +135,36 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(38,185,255,0.8)',
     padding: 20,
     borderRadius: 20,
+  },
+  section: {
+    marginBottom: 30,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#000',
+    marginBottom: 15,
+  },
+  quickActionButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 15,
+    marginBottom: 10,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  quickActionText: {
+    flex: 1,
+    fontSize: 16,
+    color: '#000',
+    marginLeft: 15,
   },
 });

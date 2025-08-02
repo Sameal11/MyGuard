@@ -50,7 +50,7 @@ export default function VisitorManagement() {
   return (
     <View style={styles.container}>
       {/* Header */}
-      <View style={styles.header}>
+      {/* <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <MaterialIcons name="arrow-back" size={24} color="#000" />
         </TouchableOpacity>
@@ -61,7 +61,7 @@ export default function VisitorManagement() {
         >
           <MaterialIcons name="add" size={24} color="#007AFF" />
         </TouchableOpacity>
-      </View>
+      </View> */}
 
       <ScrollView style={styles.content}>
         {/* Pending Approvals */}
@@ -139,7 +139,7 @@ export default function VisitorManagement() {
             onPress={() => router.push('/vehicle-management')}
           >
             <MaterialIcons name="directions-car" size={24} color="#007AFF" />
-            <Text style={styles.quickActionText}>Vehicle Management</Text>
+            <Text style={styles.quickActionText}>Vehicle History</Text>
             <MaterialIcons name="chevron-right" size={24} color="#007AFF" />
           </TouchableOpacity>
         </View>
@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 20,
-    paddingTop: 50,
+    paddingTop: 10,
     paddingBottom: 20,
     backgroundColor: '#fff',
     borderBottomWidth: 1,
