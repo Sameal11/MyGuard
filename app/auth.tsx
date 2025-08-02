@@ -1,11 +1,27 @@
 
 import {View,Button,StyleSheet, KeyboardAvoidingView,Platform,} from "react-native";
 import { Text,TextInput } from "react-native-paper";
+
+import { useRouter } from "expo-router";
+
+
+
+
+
 export default function AuthScreen() {
+    const router = useRouter();
+
+    function handleLogin() {
+    // Your login logic
+        console.log("Login successful");
+        router.push('/verification'); // or '/home' or whatever your home route is
+    }
+
     return (
         <KeyboardAvoidingView
             style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
             behavior={Platform.OS === "ios" ? "padding" : "height"}
+            
         >
             <View style={{ width: "80%" }}>
                 <Text style={{ fontSize: 30, fontWeight: "bold", marginBottom: 20, textAlign: "center" }}>
@@ -50,9 +66,8 @@ export default function AuthScreen() {
                  */}
                 <Button
                     title="Login"
-                    onPress={() => {
-                        console.log("Login pressed");
-                    }}
+                    onPress={handleLogin}
+                
                     color="coral">
 
                 </Button>

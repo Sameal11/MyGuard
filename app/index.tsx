@@ -1,45 +1,34 @@
-import { Link } from "expo-router";
-import { StyleSheet, Text, View } from "react-native";
+import { useRouter } from "expo-router";
+import { useEffect, useState } from "react";
+import { View, Text } from "react-native";
 
-export default function Index() {
+export default function IndexRedirect() {
+  const router = useRouter();
+  const [isRouterReady, setIsRouterReady] = useState(false);
+
+  const isAuthenticated = true; // 🔁 Change to false to test redirect
+    
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setIsRouterReady(true);
+    }, 0); // Ensures it's called after router is mounted
+
+    return () => clearTimeout(timeout);
+  }, []);
+
+  useEffect(() => {
+    if (!isRouterReady) return;
+
+    if (isAuthenticated) {
+      router.replace("/Screens/home"); // Redirect to home if authenticated
+    } else {
+      router.replace("/Screens/auth"); // Redirect to auth if not authenticated
+    }
+  }, [isRouterReady]);
+
   return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <Text>Welcome to MyGuard </Text>
-      <Link href="/auth"  style={styles .navbutton
-        // color: "black",
-        // width: 100,
-        // height:40,
-        // borderBlockColor: "black",
-        // backgroundColor: "coral",
-        // borderWidth: 1,
-        // borderRadius: 8,
-        // padding: 10,
-      }>Login here </Link>
+    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+      <Text>Redirecting...</Text>
     </View>
-  )
+  );
 }
-
-const styles = StyleSheet.create({
-  view: {
-    flex:1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  navbutton: {
-    color: "black",
-    width: 100,
-    height: 40,
-    borderBlockColor: "black",
-    backgroundColor: "coral",
-    borderWidth: 1,
-    borderRadius: 8,
-    padding: 10,
-  }
-
-})
