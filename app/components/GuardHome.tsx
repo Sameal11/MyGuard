@@ -1,29 +1,26 @@
 // components/GuardHome.tsx
+// components/GuardHome.tsx
 import React, { useState } from 'react';
-import { 
-  View, 
-  Text, 
-  TouchableOpacity, 
-  StyleSheet, 
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
   ScrollView,
-  Alert,
-  Modal,
-  TextInput,
-  Image
 } from 'react-native';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useRouter } from 'expo-router';
-import { testVisitors } from '../../lib/testData';
 import { useUser } from '../../lib/userContext';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import { BarCodeScanner } from 'expo-barcode-scanner';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
+import iconSet from '@expo/vector-icons/build/Fontisto';
 
 export default function GuardHome() {
   const router = useRouter();
   const { currentUser } = useUser();
-  
+
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       {/* Profile row */}
       <View style={styles.profileRow}>
         <View style={styles.avatarCircle} />
@@ -31,42 +28,57 @@ export default function GuardHome() {
           <Text style={styles.name}>{currentUser?.name || 'Guard'}</Text>
           <Text style={styles.area}>{currentUser?.plotNumber || 'Area'}</Text>
         </TouchableOpacity>
+
+        {/* QR Scanner Button */}
         <TouchableOpacity onPress={() => router.push('/scanner')}>
-            <MaterialCommunityIcons name="line-scan" size={50} color="black"  style={{marginLeft: 25,}} />
+          <MaterialCommunityIcons
+            name="line-scan"
+            size={50}
+            color="black"
+            style={{ marginLeft: 25 }}
+          />
         </TouchableOpacity>
       </View>
 
-
+      {/* Overlay Section */}
       <View style={styles.overlay}>
         {/* Notice */}
         <View style={styles.noticeBox}>
           <Text style={styles.noticeText}>Notice</Text>
-          <Text style={styles.noticeText}>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</Text>
+          <Text style={styles.noticeText}>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor.
+          </Text>
         </View>
 
         {/* Visitor Categories */}
         <View style={styles.categories}>
-          {
-            [
-              { id: 'courier', label: 'Courier', screen: '/courier-entry' ,icon: <MaterialCommunityIcons name="truck-delivery" size={24} color="black" />, },
-              { id: 'cab', label: 'Cab/Taxi', screen: '/taxi-entry' },
-              { id: 'office', label: 'Office', screen: '/office-visitor-entry' },
-              { id: 'construction', label: 'Construction', screen: '/construction-entry' },
-            ].map((item, index) => (
-              <TouchableOpacity
-                key={index}
-                style={styles.categoryButton}
-                onPress={() => router.push(item.screen)}
-              >
-                <Text>{item.label}</Text>
-              </TouchableOpacity>
-            ))
-          }
+          {[
+            {
+              id: 'courier',
+              label: 'Courier',
+              screen: '/courier-entry',
+              icon: <MaterialCommunityIcons name="truck-delivery" size={24} color="black" />,
+            },
+            { id: 'cab', label: 'Cab/Taxi', screen: '/taxi-entry',icon: <FontAwesome name="cab" size={24} color="black" /> },
+            { id: 'office', label: 'Office', screen: '/office-visitor-entry' , icon: <MaterialIcons name="business" size={24} color="black" />},
+            { id: 'construction', label: 'Construction', screen: '/construction-entry', icon: <MaterialIcons name="build" size={24} color="black" /> },
+          ].map((item, index) => (
+            <TouchableOpacity
+              key={index}
+              style={styles.categoryButton}
+              onPress={() => router.push(item.screen)}
+            >
+              {item.icon && <View style={{ marginBottom: 5 }}>{item.icon}</View>}
+              <Text>{item.label}</Text>
+            </TouchableOpacity>
+          ))}
         </View>
+
         {/* Quick Actions */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Quick Actions</Text>
-          <TouchableOpacity 
+
+          <TouchableOpacity
             style={styles.quickActionButton}
             onPress={() => router.push('/pre-approve-visitor')}
           >
@@ -74,8 +86,8 @@ export default function GuardHome() {
             <Text style={styles.quickActionText}>Pre-approve Visitor</Text>
             <MaterialIcons name="chevron-right" size={24} color="#007AFF" />
           </TouchableOpacity>
-          
-          <TouchableOpacity 
+
+          <TouchableOpacity
             style={styles.quickActionButton}
             onPress={() => router.push('/visitor-history')}
           >
@@ -83,8 +95,8 @@ export default function GuardHome() {
             <Text style={styles.quickActionText}>Visitor History</Text>
             <MaterialIcons name="chevron-right" size={24} color="#007AFF" />
           </TouchableOpacity>
-          
-          <TouchableOpacity 
+
+          <TouchableOpacity
             style={styles.quickActionButton}
             onPress={() => router.push('/vehicle-management')}
           >
@@ -94,9 +106,7 @@ export default function GuardHome() {
           </TouchableOpacity>
         </View>
       </View>
-
-      {/* Entry log */}
-    </View>
+    </ScrollView>
   );
 }
 

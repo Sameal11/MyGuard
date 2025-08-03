@@ -17,6 +17,7 @@ export default function RootLayout() {
         <Stack.Screen name="taxi-entry" options={{ headerShown: false }} />
         <Stack.Screen name="office-visitor-entry" options={{ headerShown: false }} />
         <Stack.Screen name="construction-entry" options={{ headerShown: false }} />
+        <Stack.Screen name="scanner" options={{ title: "Scanner" }} />
       </Stack>
     </UserProvider>
   );

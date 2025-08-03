@@ -6,6 +6,8 @@ import React, { useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { documentTypes } from '../lib/testData';
 import { useUser } from '../lib/userContext';
+import { StatusBar } from 'react-native';
+
 
 export default function UploadIdScreen() {
   const { currentUser, setCurrentUser } = useUser();
@@ -52,6 +54,7 @@ setTimeout(() => {
 
   return (
     <View style={styles.container}>
+      <StatusBar barStyle="dark-content" backgroundColor="rgba(6, 7, 7, 1)" />
       {/* Profile row */}
       <View style={styles.profileRow}>
         <View style={styles.avatarCircle} />

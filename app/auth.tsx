@@ -4,6 +4,8 @@ import { useRouter } from "expo-router";
 import React, { useState } from 'react';
 import { authenticateUser } from '../lib/testData';
 import { useUser } from '../lib/userContext';
+import { StatusBar } from 'react-native';
+
 
 export default function AuthScreen() {
     const router = useRouter();
@@ -55,6 +57,7 @@ export default function AuthScreen() {
             
         >
             <View style={{ width: "80%" }}>
+                <StatusBar barStyle="dark-content" backgroundColor="rgba(6, 7, 7, 1)" />
                 <Text style={{ fontSize: 30, fontWeight: "bold", marginBottom: 20, textAlign: "center" }}>
                     MyGuard By GTk</Text>
                 

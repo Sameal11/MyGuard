@@ -3,6 +3,7 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useRouter } from 'expo-router';
 import React from 'react';
+import { StatusBar } from 'react-native';
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { testVisitors, testNotices } from '../../lib/testData';
 
@@ -13,6 +14,8 @@ export default function ResidentHome() {
 
   return (
     <View style={styles.container}>
+      <StatusBar barStyle="dark-content" backgroundColor="rgba(6, 7, 7, 1)" />
+      {/* Header */}
       {/* Profile Row */}
       <View style={styles.profileRow}>
         <View style={styles.avatarCircle} />

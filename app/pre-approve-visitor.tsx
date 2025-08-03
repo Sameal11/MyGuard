@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   View,
   Text,
@@ -13,6 +13,9 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import RNPickerSelect from 'react-native-picker-select';
 import QRCode from 'react-native-qrcode-svg';
+import * as FileSystem from 'expo-file-system';
+import * as Sharing from 'expo-sharing';
+import ViewShot from 'react-native-view-shot';
 
 export default function PreApproveVisitor() {
   const router = useRouter();
@@ -24,6 +27,7 @@ export default function PreApproveVisitor() {
   const [validTo, setValidTo] = useState('');
   const [showQRCode, setShowQRCode] = useState(false);
   const [qrCodeData, setQRCodeData] = useState('');
+  const qrViewRef = useRef(null);
 
   const visitorTypes = [
     { label: 'Guest', value: 'guest' },
@@ -46,7 +50,7 @@ export default function PreApproveVisitor() {
       purpose,
       validFrom,
       validTo,
-      flatNumber: 'Plot-101', // This would come from user profile
+      flatNumber: 'Plot-101',
       approvedBy: 'Anuj Munda',
       timestamp: new Date().toISOString(),
       id: Math.random().toString(36).substr(2, 9),
@@ -56,14 +60,23 @@ export default function PreApproveVisitor() {
     setShowQRCode(true);
   };
 
-  const shareQRCode = () => {
-    // In a real app, you would implement sharing functionality
-    Alert.alert('Share', 'QR Code sharing functionality would be implemented here');
+  const shareQRCode = async () => {
+    try {
+      const uri = await qrViewRef.current.capture();
+      const isSharingAvailable = await Sharing.isAvailableAsync();
+      if (!isSharingAvailable) {
+        Alert.alert('Not Available', 'Sharing is not available on this device.');
+        return;
+      }
+      await Sharing.shareAsync(uri);
+    } catch (err) {
+      console.error(err);
+      Alert.alert('Error', 'Failed to share QR Code');
+    }
   };
 
   return (
     <View style={styles.container}>
-      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <MaterialIcons name="arrow-back" size={24} color="#000" />
@@ -74,7 +87,6 @@ export default function PreApproveVisitor() {
 
       <ScrollView style={styles.content}>
         <View style={styles.form}>
-          {/* Visitor Name */}
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Visitor Name *</Text>
             <TextInput
@@ -86,7 +98,6 @@ export default function PreApproveVisitor() {
             />
           </View>
 
-          {/* Visitor Phone */}
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Phone Number *</Text>
             <TextInput
@@ -100,7 +111,6 @@ export default function PreApproveVisitor() {
             />
           </View>
 
-          {/* Visitor Type */}
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Visitor Type *</Text>
             <View style={styles.pickerContainer}>
@@ -117,7 +127,6 @@ export default function PreApproveVisitor() {
             </View>
           </View>
 
-          {/* Purpose */}
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Purpose of Visit</Text>
             <TextInput
@@ -131,17 +140,11 @@ export default function PreApproveVisitor() {
             />
           </View>
 
-          {/* Valid From */}
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Valid From</Text>
             <TouchableOpacity
               style={styles.dateInput}
-              onPress={() => {
-                // In a real app, you would implement date picker
-                const currentDate = new Date().toISOString().split('T')[0];
-                setValidFrom(currentDate);
-              }}
-            >
+              onPress={() => setValidFrom(new Date().toISOString().split('T')[0])}>
               <Text style={[styles.dateText, !validFrom && styles.placeholder]}>
                 {validFrom || 'Select date'}
               </Text>
@@ -149,18 +152,15 @@ export default function PreApproveVisitor() {
             </TouchableOpacity>
           </View>
 
-          {/* Valid To */}
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Valid Until</Text>
             <TouchableOpacity
               style={styles.dateInput}
               onPress={() => {
-                // In a real app, you would implement date picker
                 const tomorrow = new Date();
                 tomorrow.setDate(tomorrow.getDate() + 1);
                 setValidTo(tomorrow.toISOString().split('T')[0]);
-              }}
-            >
+              }}>
               <Text style={[styles.dateText, !validTo && styles.placeholder]}>
                 {validTo || 'Select date'}
               </Text>
@@ -168,7 +168,6 @@ export default function PreApproveVisitor() {
             </TouchableOpacity>
           </View>
 
-          {/* Generate QR Code Button */}
           <TouchableOpacity style={styles.generateButton} onPress={generateQRCode}>
             <MaterialIcons name="qr-code" size={24} color="#fff" />
             <Text style={styles.generateButtonText}>Generate QR Code</Text>
@@ -176,13 +175,11 @@ export default function PreApproveVisitor() {
         </View>
       </ScrollView>
 
-      {/* QR Code Modal */}
       <Modal
         visible={showQRCode}
         transparent={true}
         animationType="slide"
-        onRequestClose={() => setShowQRCode(false)}
-      >
+        onRequestClose={() => setShowQRCode(false)}>
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
@@ -194,29 +191,23 @@ export default function PreApproveVisitor() {
 
             <View style={styles.qrContainer}>
               {qrCodeData && (
-                <QRCode
-                  value={qrCodeData}
-                  size={200}
-                  color="black"
-                  backgroundColor="white"
-                />
+                <ViewShot ref={qrViewRef} options={{ format: 'png', quality: 1.0 }}>
+                  <View style={styles.qrCodeImage}>
+                    <QRCode
+                      value={qrCodeData}
+                      size={240}
+                      color="black"
+                      backgroundColor="white"
+                    />
+                  </View>
+                </ViewShot>
               )}
             </View>
 
-            <View style={styles.visitorDetails}>
-              <Text style={styles.detailText}>Visitor: {visitorName}</Text>
-              <Text style={styles.detailText}>Phone: {visitorPhone}</Text>
-              <Text style={styles.detailText}>Type: {visitorType}</Text>
-              {validFrom && <Text style={styles.detailText}>Valid From: {validFrom}</Text>}
-              {validTo && <Text style={styles.detailText}>Valid Until: {validTo}</Text>}
-            </View>
-
-            <View style={styles.modalActions}>
-              <TouchableOpacity style={styles.shareButton} onPress={shareQRCode}>
-                <MaterialIcons name="share" size={20} color="#fff" />
-                <Text style={styles.shareButtonText}>Share QR Code</Text>
-              </TouchableOpacity>
-            </View>
+            <TouchableOpacity style={styles.shareButton} onPress={shareQRCode}>
+              <MaterialIcons name="share" size={20} color="#fff" />
+              <Text style={styles.shareButtonText}>Share QR Code</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </Modal>
@@ -225,10 +216,7 @@ export default function PreApproveVisitor() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
+  container: { flex: 1, backgroundColor: '#f5f5f5' },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -240,32 +228,12 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#e0e0e0',
   },
-  backButton: {
-    padding: 8,
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#000',
-  },
-  content: {
-    flex: 1,
-    padding: 20,
-  },
-  form: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 20,
-  },
-  inputGroup: {
-    marginBottom: 20,
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#000',
-    marginBottom: 8,
-  },
+  backButton: { padding: 8 },
+  headerTitle: { fontSize: 18, fontWeight: 'bold', color: '#000' },
+  content: { flex: 1, padding: 20 },
+  form: { backgroundColor: '#fff', borderRadius: 12, padding: 20 },
+  inputGroup: { marginBottom: 20 },
+  label: { fontSize: 16, fontWeight: '600', color: '#000', marginBottom: 8 },
   input: {
     borderWidth: 1,
     borderColor: '#e0e0e0',
@@ -275,10 +243,7 @@ const styles = StyleSheet.create({
     color: '#000',
     backgroundColor: '#fff',
   },
-  textArea: {
-    height: 80,
-    textAlignVertical: 'top',
-  },
+  textArea: { height: 80, textAlignVertical: 'top' },
   pickerContainer: {
     borderWidth: 1,
     borderColor: '#e0e0e0',
@@ -301,13 +266,8 @@ const styles = StyleSheet.create({
     padding: 12,
     backgroundColor: '#fff',
   },
-  dateText: {
-    fontSize: 16,
-    color: '#000',
-  },
-  placeholder: {
-    color: '#999',
-  },
+  dateText: { fontSize: 16, color: '#000' },
+  placeholder: { color: '#999' },
   generateButton: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -343,28 +303,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 20,
   },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#000',
-  },
+  modalTitle: { fontSize: 18, fontWeight: 'bold', color: '#000' },
   qrContainer: {
     alignItems: 'center',
     marginBottom: 20,
-    padding: 20,
     backgroundColor: '#f9f9f9',
     borderRadius: 12,
-  },
-  visitorDetails: {
-    marginBottom: 20,
-  },
-  detailText: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 4,
-  },
-  modalActions: {
-    alignItems: 'center',
+    padding: 20,
   },
   shareButton: {
     flexDirection: 'row',
@@ -373,11 +318,18 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 12,
     paddingHorizontal: 20,
+    justifyContent: 'center',
   },
   shareButtonText: {
     color: '#fff',
     fontSize: 16,
     fontWeight: '600',
     marginLeft: 8,
+  },
+  qrCodeImage: {
+    padding: 30,
+    backgroundColor: '#fff',
+    borderRadius: 15,
+    alignItems: 'center',
   },
 });

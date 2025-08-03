@@ -46,10 +46,16 @@ export default function ResidentSettingsScreen() {
       {/* Settings Options */}
       <View style={styles.settingsList}>
         {currentUser?.userType === 'resident' && (
-          <TouchableOpacity style={styles.settingsItem}>
-            <MaterialIcons name="group" size={28} color="#39AEE4" style={styles.icon} />
-            <Text style={styles.settingsText}>My Flatmates</Text>
-          </TouchableOpacity>
+          <>
+            <TouchableOpacity style={styles.settingsItem}>
+              <MaterialIcons name="group" size={28} color="#39AEE4" style={styles.icon} />
+              <Text style={styles.settingsText}>My Flatmates</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.settingsItem} onPress={handleVehicleManagement}>
+              <MaterialIcons name="directions-car" size={28} color="#39AEE4" style={styles.icon} />
+              <Text style={styles.settingsText}>Vehicle</Text>
+            </TouchableOpacity>
+          </>
         )}
         
         {currentUser?.userType === 'guard' && (
@@ -66,10 +72,6 @@ export default function ResidentSettingsScreen() {
           </>
         )}
         
-        <TouchableOpacity style={styles.settingsItem} onPress={handleVehicleManagement}>
-          <MaterialIcons name="directions-car" size={28} color="#39AEE4" style={styles.icon} />
-          <Text style={styles.settingsText}>Vehicle</Text>
-        </TouchableOpacity>
         <TouchableOpacity style={styles.settingsItem}>
           <MaterialIcons name="support-agent" size={28} color="#39AEE4" style={styles.icon} />
           <Text style={styles.settingsText}>Manage Support</Text>
