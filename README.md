@@ -3,6 +3,30 @@
 This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
 
 ## Get started
+  # Project Dependencies
+
+Below is a list of all external npm packages used in this project (from all imports):
+
+- @expo/vector-icons
+- expo-camera
+- expo-document-picker
+- expo-file-system
+- expo-router
+- expo-sharing
+- react
+- react-native
+- react-native-paper
+- react-native-picker-select
+- react-native-qrcode-svg
+- react-native-view-shot
+
+To install all dependencies, run:
+
+```
+npm install @expo/vector-icons expo-camera expo-document-picker expo-file-system expo-router expo-sharing react react-native react-native-paper react-native-picker-select react-native-qrcode-svg react-native-view-shot
+```
+
+> **Note:** Some dependencies may already be included with Expo or React Native. If you encounter issues, check the [Expo documentation](https://docs.expo.dev/) for managed dependencies.
 
 1. Install dependencies
 
@@ -33,7 +57,12 @@ When you're ready, run:
 npm run reset-project
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+
+## Project Dependencies
+
+See [DEPENDENCIES.md](./DEPENDENCIES.md) for a full list of required npm packages and a one-line install command for all dependencies used in this project.
+
+This will help you install everything needed for all imports in the codebase.
 
 ## Learn more
 
