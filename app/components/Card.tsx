@@ -1,10 +1,12 @@
 import React from 'react';
 import {
-  View,
   StyleSheet,
-  ViewStyle,
   TouchableOpacity,
+  View,
+  ViewStyle,
 } from 'react-native';
+import { moderateScale, verticalScale } from '../../lib/scaling';
+import { useTheme } from '../../lib/themeContext';
 
 interface CardProps {
   children: React.ReactNode;
@@ -19,12 +21,14 @@ const Card: React.FC<CardProps> = ({
   onPress,
   disabled = false,
 }) => {
+  const { theme } = useTheme();
   const Container = onPress ? TouchableOpacity : View;
   
   return (
     <Container
       style={[
         styles.card,
+        { backgroundColor: theme.card, shadowColor: theme.text },
         style,
         disabled && styles.disabled,
       ]}
@@ -39,11 +43,9 @@ const Card: React.FC<CardProps> = ({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 16,
-    marginVertical: 8,
-    shadowColor: '#000',
+    borderRadius: moderateScale(12),
+    padding: moderateScale(16),
+    marginVertical: verticalScale(8),
     shadowOffset: {
       width: 0,
       height: 2,
@@ -57,4 +59,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Card; 
+export default Card;

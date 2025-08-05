@@ -1,12 +1,14 @@
 import React from 'react';
 import {
-  TouchableOpacity,
-  Text,
-  StyleSheet,
   ActivityIndicator,
-  ViewStyle,
+  StyleSheet,
+  Text,
   TextStyle,
+  TouchableOpacity,
+  ViewStyle,
 } from 'react-native';
+import { moderateScale, scale, verticalScale } from '../../lib/scaling';
+import { useTheme } from '../../lib/themeContext';
 
 interface ButtonProps {
   title: string;
@@ -29,9 +31,84 @@ const Button: React.FC<ButtonProps> = ({
   style,
   textStyle,
 }) => {
+  const { theme } = useTheme();
+
+  const getBackgroundColor = () => {
+    switch (variant) {
+      case 'primary':
+        return theme.primary;
+      case 'danger':
+        return '#FF3B30';
+      case 'secondary':
+        return theme.card;
+      default:
+        return 'transparent';
+    }
+  };
+
+  const getTextColor = () => {
+    switch (variant) {
+      case 'primary':
+      case 'danger':
+        return theme.background;
+      default:
+        return theme.primary;
+    }
+  };
+
+  const styles = StyleSheet.create({
+    button: {
+      borderRadius: moderateScale(8),
+      alignItems: 'center',
+      justifyContent: 'center',
+      flexDirection: 'row',
+    },
+    // Sizes
+    small: {
+      paddingHorizontal: scale(16),
+      paddingVertical: verticalScale(8),
+      minHeight: verticalScale(32),
+    },
+    medium: {
+      paddingHorizontal: scale(24),
+      paddingVertical: verticalScale(12),
+      minHeight: verticalScale(44),
+    },
+    large: {
+      paddingHorizontal: scale(32),
+      paddingVertical: verticalScale(16),
+      minHeight: verticalScale(56),
+    },
+    // Text styles
+    text: {
+      fontWeight: '600',
+      textAlign: 'center',
+    },
+    smallText: {
+      fontSize: moderateScale(14),
+    },
+    mediumText: {
+      fontSize: moderateScale(16),
+    },
+    largeText: {
+      fontSize: moderateScale(18),
+    },
+    // Disabled state
+    disabled: {
+      opacity: 0.5,
+    },
+    disabledText: {
+      opacity: 0.7,
+    },
+  });
+
   const buttonStyle = [
     styles.button,
-    styles[variant],
+    {
+      backgroundColor: getBackgroundColor(),
+      borderColor: theme.primary,
+      borderWidth: variant === 'outline' ? 1 : 0,
+    },
     styles[size],
     disabled && styles.disabled,
     style,
@@ -39,7 +116,7 @@ const Button: React.FC<ButtonProps> = ({
 
   const textStyleCombined = [
     styles.text,
-    styles[`${variant}Text`],
+    { color: getTextColor() },
     styles[`${size}Text`],
     disabled && styles.disabledText,
     textStyle,
@@ -54,7 +131,7 @@ const Button: React.FC<ButtonProps> = ({
     >
       {loading ? (
         <ActivityIndicator
-          color={variant === 'primary' ? '#fff' : '#007AFF'}
+          color={getTextColor()}
           size="small"
         />
       ) : (
@@ -64,77 +141,4 @@ const Button: React.FC<ButtonProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
-  button: {
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexDirection: 'row',
-  },
-  // Variants
-  primary: {
-    backgroundColor: '#007AFF',
-  },
-  secondary: {
-    backgroundColor: '#F2F2F7',
-  },
-  outline: {
-    backgroundColor: 'transparent',
-    borderWidth: 1,
-    borderColor: '#007AFF',
-  },
-  danger: {
-    backgroundColor: '#FF3B30',
-  },
-  // Sizes
-  small: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    minHeight: 32,
-  },
-  medium: {
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    minHeight: 44,
-  },
-  large: {
-    paddingHorizontal: 32,
-    paddingVertical: 16,
-    minHeight: 56,
-  },
-  // Text styles
-  text: {
-    fontWeight: '600',
-    textAlign: 'center',
-  },
-  primaryText: {
-    color: '#FFFFFF',
-  },
-  secondaryText: {
-    color: '#007AFF',
-  },
-  outlineText: {
-    color: '#007AFF',
-  },
-  dangerText: {
-    color: '#FFFFFF',
-  },
-  smallText: {
-    fontSize: 14,
-  },
-  mediumText: {
-    fontSize: 16,
-  },
-  largeText: {
-    fontSize: 18,
-  },
-  // Disabled state
-  disabled: {
-    opacity: 0.5,
-  },
-  disabledText: {
-    opacity: 0.7,
-  },
-});
-
-export default Button; 
+export default Button;
