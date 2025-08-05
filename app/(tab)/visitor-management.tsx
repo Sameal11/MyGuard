@@ -1,19 +1,14 @@
-import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  Alert,
-  Image,
-} from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import React, { useState } from 'react';
+import { Alert, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { moderateScale, scale, verticalScale } from '../../lib/scaling';
 import { testVisitors } from '../../lib/testData';
+import { useTheme } from '../../lib/themeContext';
 
 export default function VisitorManagement() {
   const router = useRouter();
+  const { theme, isDarkMode } = useTheme();
   const [visitors, setVisitors] = useState(testVisitors);
 
   const handleApproval = (visitorId: string, action: 'approve' | 'reject') => {
@@ -47,29 +42,118 @@ export default function VisitorManagement() {
   const pendingVisitors = visitors.filter(v => v.status === 'pending');
   const todayVisitors = visitors.filter(v => v.status !== 'pending');
 
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.background,
+    },
+    content: {
+      flex: 1,
+      padding: moderateScale(20),
+    },
+    section: {
+      marginBottom: verticalScale(30),
+    },
+    sectionTitle: {
+      fontSize: moderateScale(18),
+      fontWeight: 'bold',
+      color: theme.text,
+      marginBottom: verticalScale(15),
+    },
+    visitorCard: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: theme.card,
+      borderRadius: moderateScale(12),
+      padding: moderateScale(15),
+      marginBottom: verticalScale(10),
+    },
+    shadow: {
+      shadowColor: '#000',
+      shadowOffset: {
+        width: 0,
+        height: 2,
+      },
+      shadowOpacity: 0.1,
+      shadowRadius: 3.84,
+      elevation: 5,
+    },
+    visitorImage: {
+      width: moderateScale(50),
+      height: moderateScale(50),
+      borderRadius: moderateScale(25),
+      backgroundColor: '#ddd',
+    },
+    visitorInfo: {
+      flex: 1,
+      marginLeft: scale(15),
+    },
+    visitorName: {
+      fontSize: moderateScale(16),
+      fontWeight: 'bold',
+      color: theme.text,
+    },
+    visitorPurpose: {
+      fontSize: moderateScale(14),
+      color: theme.text,
+      marginTop: verticalScale(2),
+    },
+    visitorTime: {
+      fontSize: moderateScale(12),
+      color: theme.text,
+      marginTop: verticalScale(2),
+    },
+    actionButtons: {
+      flexDirection: 'row',
+      gap: moderateScale(10),
+    },
+    actionButton: {
+      width: moderateScale(40),
+      height: moderateScale(40),
+      borderRadius: moderateScale(20),
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    approveButton: {
+      backgroundColor: '#4CAF50',
+    },
+    rejectButton: {
+      backgroundColor: '#F44336',
+    },
+    statusBadge: {
+      paddingHorizontal: scale(12),
+      paddingVertical: verticalScale(6),
+      borderRadius: moderateScale(12),
+    },
+    statusText: {
+      color: '#fff',
+      fontSize: moderateScale(12),
+      fontWeight: 'bold',
+    },
+    quickActionButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: theme.card,
+      borderRadius: moderateScale(12),
+      padding: moderateScale(15),
+      marginBottom: verticalScale(10),
+    },
+    quickActionText: {
+      flex: 1,
+      fontSize: moderateScale(16),
+      color: theme.text,
+      marginLeft: scale(15),
+    },
+  });
+
   return (
     <View style={styles.container}>
-      {/* Header */}
-      {/* <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <MaterialIcons name="arrow-back" size={24} color="#000" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Visitor Management</Text>
-        <TouchableOpacity 
-          onPress={() => router.push('/pre-approve-visitor')}
-          style={styles.addButton}
-        >
-          <MaterialIcons name="add" size={24} color="#007AFF" />
-        </TouchableOpacity>
-      </View> */}
-
       <ScrollView style={styles.content}>
-        {/* Pending Approvals */}
         {pendingVisitors.length > 0 && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Pending Approvals</Text>
             {pendingVisitors.map((visitor) => (
-              <View key={visitor.id} style={styles.visitorCard}>
+              <View key={visitor.id} style={[styles.visitorCard, !isDarkMode && styles.shadow]}>
                 <Image source={{ uri: visitor.image }} style={styles.visitorImage} />
                 <View style={styles.visitorInfo}>
                   <Text style={styles.visitorName}>{visitor.name}</Text>
@@ -81,13 +165,13 @@ export default function VisitorManagement() {
                     style={[styles.actionButton, styles.approveButton]}
                     onPress={() => handleApproval(visitor.id, 'approve')}
                   >
-                    <MaterialIcons name="check" size={20} color="#fff" />
+                    <MaterialIcons name="check" size={moderateScale(20)} color="#fff" />
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={[styles.actionButton, styles.rejectButton]}
                     onPress={() => handleApproval(visitor.id, 'reject')}
                   >
-                    <MaterialIcons name="close" size={20} color="#fff" />
+                    <MaterialIcons name="close" size={moderateScale(20)} color="#fff" />
                   </TouchableOpacity>
                 </View>
               </View>
@@ -95,11 +179,10 @@ export default function VisitorManagement() {
           </View>
         )}
 
-        {/* Today's Visitors */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Today's Visitors</Text>
           {todayVisitors.map((visitor) => (
-            <View key={visitor.id} style={styles.visitorCard}>
+            <View key={visitor.id} style={[styles.visitorCard, !isDarkMode && styles.shadow]}>
               <Image source={{ uri: visitor.image }} style={styles.visitorImage} />
               <View style={styles.visitorInfo}>
                 <Text style={styles.visitorName}>{visitor.name}</Text>
@@ -113,169 +196,36 @@ export default function VisitorManagement() {
           ))}
         </View>
 
-        {/* Quick Actions */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Quick Actions</Text>
-          <TouchableOpacity 
-            style={styles.quickActionButton}
+          <TouchableOpacity
+            style={[styles.quickActionButton, !isDarkMode && styles.shadow]}
             onPress={() => router.push('/pre-approve-visitor')}
           >
-            <MaterialIcons name="person-add" size={24} color="#007AFF" />
+            <MaterialIcons name="person-add" size={moderateScale(24)} color={theme.primary} />
             <Text style={styles.quickActionText}>Pre-approve Visitor</Text>
-            <MaterialIcons name="chevron-right" size={24} color="#007AFF" />
+            <MaterialIcons name="chevron-right" size={moderateScale(24)} color={theme.primary} />
           </TouchableOpacity>
           
-          <TouchableOpacity 
-            style={styles.quickActionButton}
+          <TouchableOpacity
+            style={[styles.quickActionButton, !isDarkMode && styles.shadow]}
             onPress={() => router.push('/visitor-history')}
           >
-            <MaterialIcons name="history" size={24} color="#007AFF" />
+            <MaterialIcons name="history" size={moderateScale(24)} color={theme.primary} />
             <Text style={styles.quickActionText}>Visitor History</Text>
-            <MaterialIcons name="chevron-right" size={24} color="#007AFF" />
+            <MaterialIcons name="chevron-right" size={moderateScale(24)} color={theme.primary} />
           </TouchableOpacity>
           
-          <TouchableOpacity 
-            style={styles.quickActionButton}
+          <TouchableOpacity
+            style={[styles.quickActionButton, !isDarkMode && styles.shadow]}
             onPress={() => router.push('/vehicle-management')}
           >
-            <MaterialIcons name="directions-car" size={24} color="#007AFF" />
+            <MaterialIcons name="directions-car" size={moderateScale(24)} color={theme.primary} />
             <Text style={styles.quickActionText}>Vehicle History</Text>
-            <MaterialIcons name="chevron-right" size={24} color="#007AFF" />
+            <MaterialIcons name="chevron-right" size={moderateScale(24)} color={theme.primary} />
           </TouchableOpacity>
         </View>
       </ScrollView>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingTop: 10,
-    paddingBottom: 20,
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-  },
-  backButton: {
-    padding: 8,
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#000',
-  },
-  addButton: {
-    padding: 8,
-  },
-  content: {
-    flex: 1,
-    padding: 20,
-  },
-  section: {
-    marginBottom: 30,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#000',
-    marginBottom: 15,
-  },
-  visitorCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 15,
-    marginBottom: 10,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  visitorImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: '#ddd',
-  },
-  visitorInfo: {
-    flex: 1,
-    marginLeft: 15,
-  },
-  visitorName: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#000',
-  },
-  visitorPurpose: {
-    fontSize: 14,
-    color: '#666',
-    marginTop: 2,
-  },
-  visitorTime: {
-    fontSize: 12,
-    color: '#999',
-    marginTop: 2,
-  },
-  actionButtons: {
-    flexDirection: 'row',
-    gap: 10,
-  },
-  actionButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  approveButton: {
-    backgroundColor: '#4CAF50',
-  },
-  rejectButton: {
-    backgroundColor: '#F44336',
-  },
-  statusBadge: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 12,
-  },
-  statusText: {
-    color: '#fff',
-    fontSize: 12,
-    fontWeight: 'bold',
-  },
-  quickActionButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 15,
-    marginBottom: 10,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  quickActionText: {
-    flex: 1,
-    fontSize: 16,
-    color: '#000',
-    marginLeft: 15,
-  },
-});

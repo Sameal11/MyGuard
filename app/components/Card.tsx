@@ -21,17 +21,20 @@ const Card: React.FC<CardProps> = ({
   onPress,
   disabled = false,
 }) => {
-  const { theme } = useTheme();
+  const { theme, isDarkMode } = useTheme();
   const Container = onPress ? TouchableOpacity : View;
+
+  const cardStyle = [
+    styles.card,
+    { backgroundColor: theme.card },
+    !isDarkMode && styles.shadow, // Apply shadow only in light mode
+    style,
+    disabled && styles.disabled,
+  ];
   
   return (
     <Container
-      style={[
-        styles.card,
-        { backgroundColor: theme.card, shadowColor: theme.text },
-        style,
-        disabled && styles.disabled,
-      ]}
+      style={cardStyle}
       onPress={onPress}
       disabled={disabled}
       activeOpacity={0.7}
@@ -46,6 +49,9 @@ const styles = StyleSheet.create({
     borderRadius: moderateScale(12),
     padding: moderateScale(16),
     marginVertical: verticalScale(8),
+  },
+  shadow: {
+    shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: 2,

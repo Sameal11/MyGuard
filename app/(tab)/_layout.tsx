@@ -1,13 +1,28 @@
 // app/(tab)/_layout.tsx
-import { Tabs } from 'expo-router';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { Tabs } from 'expo-router';
+import { useTheme } from '../../lib/themeContext';
 import { useUser } from '../../lib/userContext';
 
 export default function TabLayout() {
   const { currentUser } = useUser();
-  
+  const { theme } = useTheme();
+
   return (
-    <Tabs screenOptions={{ headerShown: true }}>
+    <Tabs
+      screenOptions={{
+        headerShown: true,
+        tabBarStyle: {
+          backgroundColor: theme.card,
+        },
+        tabBarActiveTintColor: theme.primary,
+        tabBarInactiveTintColor: theme.text,
+        headerStyle: {
+          backgroundColor: theme.background,
+        },
+        headerTintColor: theme.text,
+      }}
+    >
       <Tabs.Screen
         name="home"
         options={{

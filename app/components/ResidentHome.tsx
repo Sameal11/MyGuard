@@ -1,20 +1,160 @@
-// components/ResidentHome.tsx
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useRouter } from 'expo-router';
 import React from 'react';
-import { StatusBar } from 'react-native';
-import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { testVisitors, testNotices } from '../../lib/testData';
+import { Image, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { moderateScale, scale, verticalScale } from '../../lib/scaling';
+import { testNotices, testVisitors } from '../../lib/testData';
+import { useTheme } from '../../lib/themeContext';
 
 export default function ResidentHome() {
   const router = useRouter();
+  const { theme, isDarkMode } = useTheme();
   const visitors = testVisitors;
   const notices = testNotices;
 
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.background,
+      padding: scale(20),
+      paddingTop: verticalScale(30),
+    },
+    profileRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      marginBottom: verticalScale(20),
+    },
+    avatarCircle: {
+      width: moderateScale(60),
+      height: moderateScale(60),
+      backgroundColor: 'gold',
+      borderRadius: moderateScale(30),
+      borderColor: theme.text,
+      borderWidth: moderateScale(2),
+    },
+    nameButton: {
+      flex: 1,
+      marginHorizontal: scale(20),
+      backgroundColor: theme.card,
+      borderRadius: moderateScale(20),
+      borderWidth: 1,
+      borderColor: theme.border,
+      paddingHorizontal: scale(20),
+      paddingVertical: verticalScale(10),
+    },
+    name: {
+      fontWeight: 'bold',
+      color: theme.text,
+      fontSize: moderateScale(16),
+    },
+    area: {
+      color: theme.text,
+      fontSize: moderateScale(14),
+    },
+    overlay: {
+      backgroundColor: isDarkMode ? 'rgba(0,0,0,0.5)' : 'rgba(255,255,255,0.5)',
+      padding: moderateScale(3),
+      borderRadius: moderateScale(20),
+      flex: 1,
+    },
+    noticeBox: {
+      backgroundColor: theme.card,
+      borderRadius: moderateScale(15),
+      padding: moderateScale(10),
+      marginBottom: verticalScale(25),
+      height: verticalScale(150),
+    },
+    noticeTitle: {
+      color: theme.text,
+      fontSize: moderateScale(16),
+      fontWeight: 'bold',
+      marginBottom: verticalScale(5),
+      marginLeft: scale(10),
+    },
+    noticeText: {
+      color: theme.text,
+      fontSize: moderateScale(14),
+      marginLeft: scale(10),
+    },
+    visitorLogContainer: {
+      marginTop: verticalScale(10),
+      backgroundColor: theme.card,
+      borderRadius: moderateScale(10),
+      padding: moderateScale(1),
+    },
+    sectionTitle: {
+      fontSize: moderateScale(16),
+      fontWeight: 'bold',
+      color: theme.text,
+      marginBottom: verticalScale(10),
+      marginLeft: scale(10),
+    },
+    scrollRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    visitorItem: {
+      alignItems: 'center',
+      marginRight: scale(15),
+      marginLeft: scale(15),
+    },
+    visitorImage: {
+      width: moderateScale(60),
+      height: moderateScale(60),
+      borderRadius: moderateScale(30),
+      backgroundColor: '#ddd',
+    },
+    visitorName: {
+      marginTop: verticalScale(5),
+      fontSize: moderateScale(12),
+      color: theme.text,
+    },
+    moreItem: {
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginLeft: scale(10),
+    },
+    sections: {
+      marginBottom: verticalScale(30),
+    },
+    sectionTitles: {
+      fontSize: moderateScale(18),
+      fontWeight: 'bold',
+      color: theme.text,
+      marginBottom: verticalScale(15),
+      marginTop: verticalScale(10),
+    },
+    quickActionButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: theme.card,
+      borderRadius: moderateScale(12),
+      padding: moderateScale(15),
+      marginBottom: verticalScale(10),
+    },
+    shadow: {
+      shadowColor: '#000',
+      shadowOffset: {
+        width: 0,
+        height: 2,
+      },
+      shadowOpacity: 0.1,
+      shadowRadius: 3.84,
+      elevation: 5,
+    },
+    quickActionText: {
+      flex: 1,
+      fontSize: moderateScale(16),
+      color: theme.text,
+      marginLeft: scale(15),
+    },
+  });
+
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="rgba(6, 7, 7, 1)" />
+      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} backgroundColor={theme.background} />
       {/* Header */}
       {/* Profile Row */}
       <View style={styles.profileRow}>
@@ -24,7 +164,7 @@ export default function ResidentHome() {
           <Text style={styles.area}>Plot-101</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => router.push('/settings')}>
-          <MaterialCommunityIcons name="alert-decagram" size={32} color="black" />
+          <MaterialCommunityIcons name="alert-decagram" size={moderateScale(32)} color={theme.text} />
         </TouchableOpacity>
       </View>
 
@@ -50,7 +190,7 @@ export default function ResidentHome() {
             ))}
             {visitors.length > 4 && (
               <TouchableOpacity style={styles.moreItem} onPress={() => router.push('/(tab)/visitor-management')}>
-                <MaterialIcons name="navigate-next" size={40} color="black" />
+                <MaterialIcons name="navigate-next" size={moderateScale(40)} color={theme.text} />
                 <Text style={styles.visitorName}>More</Text>
               </TouchableOpacity>
             )}
@@ -59,190 +199,33 @@ export default function ResidentHome() {
         <View style={styles.sections}>
           <Text style={styles.sectionTitles}>Quick Actions</Text>
           <TouchableOpacity 
-            style={styles.quickActionButton}
+            style={[styles.quickActionButton, !isDarkMode && styles.shadow]}
             onPress={() => router.push('/pre-approve-visitor')}
           >
-            <MaterialIcons name="person-add" size={24} color="#007AFF" />
+            <MaterialIcons name="person-add" size={moderateScale(24)} color={theme.primary} />
             <Text style={styles.quickActionText}>Pre-approve Visitor</Text>
-            <MaterialIcons name="chevron-right" size={24} color="#007AFF" />
+            <MaterialIcons name="chevron-right" size={moderateScale(24)} color={theme.primary} />
           </TouchableOpacity>
           
           <TouchableOpacity 
-            style={styles.quickActionButton}
+            style={[styles.quickActionButton, !isDarkMode && styles.shadow]}
             onPress={() => router.push('/visitor-history')}
           >
-            <MaterialIcons name="history" size={24} color="#007AFF" />
+            <MaterialIcons name="history" size={moderateScale(24)} color={theme.primary} />
             <Text style={styles.quickActionText}>Visitor History</Text>
-            <MaterialIcons name="chevron-right" size={24} color="#007AFF" />
+            <MaterialIcons name="chevron-right" size={moderateScale(24)} color={theme.primary} />
           </TouchableOpacity>
           
           <TouchableOpacity 
-            style={styles.quickActionButton}
+            style={[styles.quickActionButton, !isDarkMode && styles.shadow]}
             onPress={() => router.push('/vehicle-management')}
           >
-            <MaterialIcons name="directions-car" size={24} color="#007AFF" />
+            <MaterialIcons name="directions-car" size={moderateScale(24)} color={theme.primary} />
             <Text style={styles.quickActionText}>Vehicle History</Text>
-            <MaterialIcons name="chevron-right" size={24} color="#007AFF" />
+            <MaterialIcons name="chevron-right" size={moderateScale(24)} color={theme.primary} />
           </TouchableOpacity>
         </View>
       </View>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f4f6f7',
-    padding: 20,
-    paddingTop: 30,
-  },
-
-  profileRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 20,
-  },
-
-  avatarCircle: {
-    width: 60,
-    height: 60,
-    backgroundColor: 'gold',
-    borderRadius: 30,
-    borderColor: 'black',
-    borderWidth: 2,
-  },
-
-  nameButton: {
-    flex: 1,
-    marginHorizontal: 20,
-    backgroundColor: '#fff',
-    borderRadius: 20,
-    borderWidth: 1,
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-  },
-
-  name: {
-    fontWeight: 'bold',
-    color: 'black',
-    fontSize: 16,
-  },
-
-  area: {
-    color: 'black',
-    fontSize: 14,
-  },
-
-  settingsIcon: {
-    marginLeft: 10,
-  },
-
-  overlay: {
-    backgroundColor: 'rgba(57, 174, 228, 0.8)',
-    padding: 3,
-    borderRadius: 20,
-    flex: 1,
-  },
-
-  noticeBox: {
-    backgroundColor: '#2F3A45',
-    borderRadius: 15,
-    padding: 0,
-    marginBottom: 25,
-    height: 150,
-  },
-
-  noticeTitle: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 5,
-    padding:3,
-    marginLeft: 10,
-  },
-
-  noticeText: {
-    color: '#e0e0e0',
-    fontSize: 14,
-    marginLeft: 10,
-  },
-
-  visitorLogContainer: {
-    marginTop: 10,
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    padding:1,
-  },
-
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#000',
-    marginBottom: 10,
-    marginLeft: 10,
-  },
-
-  scrollRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-
-  visitorItem: {
-    alignItems: 'center',
-    marginRight: 15,
-    marginLeft:15,
-  },
-
-  visitorImage: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: '#ddd',
-  },
-
-  visitorName: {
-    marginTop: 5,
-    fontSize: 12,
-    color: '#333',
-  },
-
-  moreItem: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginLeft: 10,
-  },
-  sections: {
-    marginBottom: 30,
-  },
-  sectionTitles: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#000',
-    marginBottom: 15,
-    marginTop: 10,
-  },
-  quickActionButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 15,
-    marginBottom: 10,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  quickActionText: {
-    flex: 1,
-    fontSize: 16,
-    color: '#000',
-    marginLeft: 15,
-  },
-});

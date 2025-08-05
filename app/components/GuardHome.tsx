@@ -1,23 +1,111 @@
-// components/GuardHome.tsx
-// components/GuardHome.tsx
-import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  ScrollView,
-} from 'react-native';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useRouter } from 'expo-router';
+import React from 'react';
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { moderateScale, scale, verticalScale } from '../../lib/scaling';
+import { useTheme } from '../../lib/themeContext';
 import { useUser } from '../../lib/userContext';
-import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
-import iconSet from '@expo/vector-icons/build/Fontisto';
 
 export default function GuardHome() {
   const router = useRouter();
   const { currentUser } = useUser();
+  const { theme, isDarkMode } = useTheme();
+
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.background,
+      padding: scale(20),
+      paddingTop: verticalScale(30),
+    },
+    profileRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: verticalScale(20),
+    },
+    avatarCircle: {
+      width: moderateScale(60),
+      height: moderateScale(60),
+      backgroundColor: 'gold',
+      borderRadius: moderateScale(30),
+      marginRight: scale(18),
+      borderColor: theme.text,
+      borderWidth: moderateScale(2),
+    },
+    nameButton: {
+      backgroundColor: theme.card,
+      borderRadius: moderateScale(20),
+      borderWidth: 1,
+      borderColor: theme.border,
+      paddingHorizontal: scale(70),
+      paddingVertical: verticalScale(10),
+      marginLeft: scale(10),
+    },
+    name: { fontWeight: 'bold', color: theme.text },
+    area: { fontWeight: 'bold', color: theme.text },
+    noticeBox: {
+      backgroundColor: theme.card,
+      borderRadius: moderateScale(15),
+      height: verticalScale(150),
+      padding: moderateScale(10),
+      marginBottom: verticalScale(20),
+    },
+    noticeText: { color: theme.text },
+    categories: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: moderateScale(10),
+      justifyContent: 'space-around',
+    },
+    categoryButton: {
+      backgroundColor: theme.card,
+      padding: moderateScale(20),
+      width: '45%',
+      alignItems: 'center',
+      marginVertical: verticalScale(5),
+      borderRadius: moderateScale(10),
+    },
+    shadow: {
+      shadowColor: '#000',
+      shadowOffset: {
+        width: 0,
+        height: 2,
+      },
+      shadowOpacity: 0.1,
+      shadowRadius: 3.84,
+      elevation: 5,
+    },
+    overlay: {
+      backgroundColor: isDarkMode ? 'rgba(0,0,0,0.5)' : 'rgba(255,255,255,0.5)',
+      padding: moderateScale(20),
+      borderRadius: moderateScale(20),
+    },
+    section: {
+      marginBottom: verticalScale(30),
+    },
+    sectionTitle: {
+      fontSize: moderateScale(18),
+      fontWeight: 'bold',
+      color: theme.text,
+      marginBottom: verticalScale(15),
+    },
+    quickActionButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: theme.card,
+      borderRadius: moderateScale(12),
+      padding: moderateScale(15),
+      marginBottom: verticalScale(10),
+    },
+    quickActionText: {
+      flex: 1,
+      fontSize: moderateScale(16),
+      color: theme.text,
+      marginLeft: scale(15),
+    },
+  });
 
   return (
     <ScrollView style={styles.container}>
@@ -33,9 +121,9 @@ export default function GuardHome() {
         <TouchableOpacity onPress={() => router.push('/scanner')}>
           <MaterialCommunityIcons
             name="line-scan"
-            size={50}
-            color="black"
-            style={{ marginLeft: 25 }}
+            size={moderateScale(50)}
+            color={theme.text}
+            style={{ marginLeft: scale(25) }}
           />
         </TouchableOpacity>
       </View>
@@ -57,19 +145,19 @@ export default function GuardHome() {
               id: 'courier',
               label: 'Courier',
               screen: '/courier-entry',
-              icon: <MaterialCommunityIcons name="truck-delivery" size={24} color="black" />,
+              icon: <MaterialCommunityIcons name="truck-delivery" size={moderateScale(24)} color={theme.text} />,
             },
-            { id: 'cab', label: 'Cab/Taxi', screen: '/taxi-entry',icon: <FontAwesome name="cab" size={24} color="black" /> },
-            { id: 'office', label: 'Office', screen: '/office-visitor-entry' , icon: <MaterialIcons name="business" size={24} color="black" />},
-            { id: 'construction', label: 'Construction', screen: '/construction-entry', icon: <MaterialIcons name="build" size={24} color="black" /> },
+            { id: 'cab', label: 'Cab/Taxi', screen: '/taxi-entry', icon: <FontAwesome name="cab" size={moderateScale(24)} color={theme.text} /> },
+            { id: 'office', label: 'Office', screen: '/office-visitor-entry', icon: <MaterialIcons name="business" size={moderateScale(24)} color={theme.text} /> },
+            { id: 'construction', label: 'Construction', screen: '/construction-entry', icon: <MaterialIcons name="build" size={moderateScale(24)} color={theme.text} /> },
           ].map((item, index) => (
             <TouchableOpacity
               key={index}
-              style={styles.categoryButton}
-              onPress={() => router.push(item.screen)}
+              style={[styles.categoryButton, !isDarkMode && styles.shadow]}
+              onPress={() => router.push(item.screen as any)}
             >
-              {item.icon && <View style={{ marginBottom: 5 }}>{item.icon}</View>}
-              <Text>{item.label}</Text>
+              {item.icon && <View style={{ marginBottom: verticalScale(5) }}>{item.icon}</View>}
+              <Text style={{ color: theme.text }}>{item.label}</Text>
             </TouchableOpacity>
           ))}
         </View>
@@ -79,102 +167,33 @@ export default function GuardHome() {
           <Text style={styles.sectionTitle}>Quick Actions</Text>
 
           <TouchableOpacity
-            style={styles.quickActionButton}
+            style={[styles.quickActionButton, !isDarkMode && styles.shadow]}
             onPress={() => router.push('/pre-approve-visitor')}
           >
-            <MaterialIcons name="person-add" size={24} color="#007AFF" />
+            <MaterialIcons name="person-add" size={moderateScale(24)} color={theme.primary} />
             <Text style={styles.quickActionText}>Pre-approve Visitor</Text>
-            <MaterialIcons name="chevron-right" size={24} color="#007AFF" />
+            <MaterialIcons name="chevron-right" size={moderateScale(24)} color={theme.primary} />
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={styles.quickActionButton}
+            style={[styles.quickActionButton, !isDarkMode && styles.shadow]}
             onPress={() => router.push('/visitor-history')}
           >
-            <MaterialIcons name="history" size={24} color="#007AFF" />
+            <MaterialIcons name="history" size={moderateScale(24)} color={theme.primary} />
             <Text style={styles.quickActionText}>Visitor History</Text>
-            <MaterialIcons name="chevron-right" size={24} color="#007AFF" />
+            <MaterialIcons name="chevron-right" size={moderateScale(24)} color={theme.primary} />
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={styles.quickActionButton}
+            style={[styles.quickActionButton, !isDarkMode && styles.shadow]}
             onPress={() => router.push('/vehicle-management')}
           >
-            <MaterialIcons name="directions-car" size={24} color="#007AFF" />
+            <MaterialIcons name="directions-car" size={moderateScale(24)} color={theme.primary} />
             <Text style={styles.quickActionText}>Vehicle Management</Text>
-            <MaterialIcons name="chevron-right" size={24} color="#007AFF" />
+            <MaterialIcons name="chevron-right" size={moderateScale(24)} color={theme.primary} />
           </TouchableOpacity>
         </View>
       </View>
     </ScrollView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f4f6f7ff', padding: 20 ,paddingTop:30},
-  profileRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 20 , marginTop:0},
-  avatarCircle: { width: 60, height: 60, backgroundColor: 'gold', borderRadius: 30, marginRight: 18, borderBlockColor: 'black', borderWidth: 2 },
-  nameButton: { backgroundColor: '#fff', borderRadius: 20,borderWidth:1, paddingHorizontal: 70, paddingVertical: 10, marginLeft: 10 },
-  name: { fontWeight: 'bold' , color: 'black' },
-  plot: { fontWeight: 'bold', color: 'black' },
-  area: { fontWeight: 'bold', color: 'black' },
-  noticeBox: { backgroundColor: '#2F3A45', borderRadius: 15,height:150, padding: 10, marginBottom: 20 },
-  noticeText: { color: '#fff' },
-  categories: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, justifyContent: 'space-around' },
-  categoryButton: {
-    backgroundColor: '#fff',
-    padding: 20,
-    width: '45%',
-    alignItems: 'center',
-    marginVertical: 5,
-    borderRadius: 10,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,},
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  overlay: {
-    
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 50,
-    backgroundColor: 'rgba(38,185,255,0.8)',
-    padding: 20,
-    borderRadius: 20,
-  },
-  section: {
-    marginBottom: 30,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#000',
-    marginBottom: 15,
-  },
-  quickActionButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 15,
-    marginBottom: 10,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  quickActionText: {
-    flex: 1,
-    fontSize: 16,
-    color: '#000',
-    marginLeft: 15,
-  },
-});

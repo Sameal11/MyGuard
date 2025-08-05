@@ -1,21 +1,22 @@
-import {View,Button,StyleSheet, KeyboardAvoidingView,Platform, Alert} from "react-native";
-import { Text,TextInput } from "react-native-paper";
 import { useRouter } from "expo-router";
 import React, { useState } from 'react';
+import { Alert, KeyboardAvoidingView, Platform, StatusBar, StyleSheet, View } from "react-native";
+import { Text, TextInput } from "react-native-paper";
+import { moderateScale, verticalScale } from '../lib/scaling';
 import { authenticateUser } from '../lib/testData';
+import { useTheme } from '../lib/themeContext';
 import { useUser } from '../lib/userContext';
-import { StatusBar } from 'react-native';
-
+import Button from './components/Button';
 
 export default function AuthScreen() {
     const router = useRouter();
     const { setCurrentUser } = useUser();
+    const { theme, isDarkMode } = useTheme();
     const [phoneNumber, setPhoneNumber] = useState('');
     const [otp, setOtp] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
     function handleLogin() {
-        // Validate inputs
         if (!phoneNumber || phoneNumber.length !== 10) {
             Alert.alert('Error', 'Please enter a valid 10-digit phone number');
             return;
@@ -28,15 +29,12 @@ export default function AuthScreen() {
 
         setIsLoading(true);
         
-        // Simulate authentication delay
         setTimeout(() => {
             const user = authenticateUser(phoneNumber, otp);
             
             if (user) {
                 console.log("Login successful for:", user.name);
-                // Store user in context
                 setCurrentUser(user);
-                // Navigate to verification screen for new users, or home for verified users
                 if (user.isVerified) {
                     router.push('/(tab)/home');
                 } else {
@@ -50,19 +48,49 @@ export default function AuthScreen() {
         }, 1000);
     }
 
+    const styles = StyleSheet.create({
+        container: {
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+            backgroundColor: theme.background,
+        },
+        content: {
+            width: "80%",
+        },
+        title: {
+            fontSize: moderateScale(30),
+            fontWeight: "bold",
+            marginBottom: verticalScale(20),
+            textAlign: "center",
+            color: theme.text,
+        },
+        subtitle: {
+            fontSize: moderateScale(30),
+            fontWeight: 'bold',
+            marginBottom: verticalScale(20),
+            textAlign: "center",
+            color: theme.text,
+        },
+        label: {
+            fontSize: moderateScale(20),
+            color: theme.text,
+        },
+        input: {
+            marginBottom: verticalScale(15),
+        },
+    });
+
     return (
         <KeyboardAvoidingView
-            style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+            style={styles.container}
             behavior={Platform.OS === "ios" ? "padding" : "height"}
-            
         >
-            <View style={{ width: "80%" }}>
-                <StatusBar barStyle="dark-content" backgroundColor="rgba(6, 7, 7, 1)" />
-                <Text style={{ fontSize: 30, fontWeight: "bold", marginBottom: 20, textAlign: "center" }}>
-                    MyGuard By GTk</Text>
-                
-                <Text style={{ fontSize: 30,fontWeight:'bold', marginBottom: 20,  textAlign:"center"}}>Login</Text>
-                <Text style ={styles.number }>Enter your number </Text>
+            <View style={styles.content}>
+                <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} backgroundColor={theme.background} />
+                <Text style={styles.title}>MyGuard By GTk</Text>
+                <Text style={styles.subtitle}>Login</Text>
+                <Text style={styles.label}>Enter your number</Text>
                 <TextInput
                     keyboardType="phone-pad"
                     label={"Phone Number"}
@@ -71,10 +99,12 @@ export default function AuthScreen() {
                     maxLength={10}
                     placeholder="7451235671"
                     mode="outlined"
-                    theme={{ colors: { primary: "blue" },fonts:{ labelLarge:{fontSize:18,}} }}
-                    style={{ marginBottom: 15 }}
+                    theme={{
+                        colors: { primary: theme.primary, text: theme.text, placeholder: theme.text, background: theme.card },
+                        fonts: { labelLarge: { fontSize: moderateScale(18) } } as any,
+                    }}
+                    style={styles.input}
                 />
-                {/* <Text style={{ fontSize :20 }}>Otp</Text> */}
                 <TextInput
                     label={"OTP"}
                     value={otp}
@@ -84,25 +114,19 @@ export default function AuthScreen() {
                     maxLength={4}
                     mode="outlined"
                     secureTextEntry
-                    theme={{ colors: { primary: "blue" },fonts:{ labelLarge:{fontSize:18,}} }}
-                    style={{ marginBottom: 20 }}
+                    theme={{
+                        colors: { primary: theme.primary, text: theme.text, placeholder: theme.text, background: theme.card },
+                        fonts: { labelLarge: { fontSize: moderateScale(18) } } as any,
+                    }}
+                    style={{ marginBottom: verticalScale(20) }}
                 />
-                {/*<Button style={{}} title="Login" onPress={() => {}} />
-                 */}
                 <Button
                     title="Login"
                     onPress={handleLogin}
-                
-                    color="coral">
-
-                </Button>
+                    loading={isLoading}
+                    variant="primary"
+                />
             </View>
         </KeyboardAvoidingView>
-        
     );
 }
-const styles=StyleSheet.create({
-    number:{
-        fontSize :20,
-    },
-});

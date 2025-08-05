@@ -55,7 +55,7 @@ export default function ResidentSettingsScreen() {
       height: moderateScale(60),
       backgroundColor: 'gold',
       borderRadius: moderateScale(30),
-      borderColor: 'black',
+      borderColor: theme.text,
       borderWidth: moderateScale(2),
     },
     nameButton: {
@@ -64,6 +64,7 @@ export default function ResidentSettingsScreen() {
       backgroundColor: theme.card,
       borderRadius: moderateScale(20),
       borderWidth: 1,
+      borderColor: theme.border,
       paddingHorizontal: scale(20),
       paddingVertical: verticalScale(10),
     },
@@ -88,7 +89,7 @@ export default function ResidentSettingsScreen() {
       padding: moderateScale(18),
       marginBottom: verticalScale(18),
       borderWidth: 1,
-      borderColor: '#e0e0e0',
+      borderColor: theme.border,
     },
     icon: {
       marginRight: scale(18),
@@ -104,7 +105,7 @@ export default function ResidentSettingsScreen() {
       padding: moderateScale(18),
       marginBottom: verticalScale(18),
       borderWidth: 1,
-      borderColor: '#2196F3',
+      borderColor: theme.primary,
     },
     positionLabel: {
       fontSize: moderateScale(14),

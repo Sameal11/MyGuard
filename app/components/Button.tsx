@@ -31,7 +31,7 @@ const Button: React.FC<ButtonProps> = ({
   style,
   textStyle,
 }) => {
-  const { theme } = useTheme();
+  const { theme, isDarkMode } = useTheme();
 
   const getBackgroundColor = () => {
     switch (variant) {
@@ -62,6 +62,16 @@ const Button: React.FC<ButtonProps> = ({
       alignItems: 'center',
       justifyContent: 'center',
       flexDirection: 'row',
+    },
+    shadow: {
+      shadowColor: '#000',
+      shadowOffset: {
+        width: 0,
+        height: 2,
+      },
+      shadowOpacity: 0.1,
+      shadowRadius: 3.84,
+      elevation: 5,
     },
     // Sizes
     small: {
@@ -109,6 +119,7 @@ const Button: React.FC<ButtonProps> = ({
       borderColor: theme.primary,
       borderWidth: variant === 'outline' ? 1 : 0,
     },
+    !isDarkMode && styles.shadow,
     styles[size],
     disabled && styles.disabled,
     style,

@@ -1,19 +1,21 @@
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import RNPickerSelect from 'react-native-picker-select';
 import * as DocumentPicker from 'expo-document-picker';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import RNPickerSelect from 'react-native-picker-select';
+import { moderateScale, scale, verticalScale } from '../lib/scaling';
 import { documentTypes } from '../lib/testData';
+import { useTheme } from '../lib/themeContext';
 import { useUser } from '../lib/userContext';
-import { StatusBar } from 'react-native';
-
+import Button from './components/Button';
 
 export default function UploadIdScreen() {
   const { currentUser, setCurrentUser } = useUser();
+  const { theme, isDarkMode } = useTheme();
   const [documentType, setDocumentType] = useState('');
   const [selectedFile, setSelectedFile] = useState<DocumentPicker.DocumentPickerAsset | null>(null);
-  const [status, setStatus] = useState<'idle' | 'submitting' |'waiting' | 'approved' | 'rejected'>('idle');
+  const [status, setStatus] = useState<'idle' | 'submitting' | 'waiting' | 'approved' | 'rejected'>('idle');
 
   const handleUpload = async () => {
     const result = await DocumentPicker.getDocumentAsync({
@@ -26,50 +28,114 @@ export default function UploadIdScreen() {
 
   const handleSubmit = () => {
     if (!documentType || !selectedFile) {
-        alert('Please select a document type and upload a file first.');
-        return;
+      Alert.alert('Error', 'Please select a document type and upload a file first.');
+      return;
     }
 
-    setStatus('submitting'); // show loading...
-      // Simulate upload
+    setStatus('submitting');
     setTimeout(() => {
-        setStatus('waiting'); // Simulate that it is now waiting for admin review
+      setStatus('waiting');
+      setTimeout(() => {
+        const approved = Math.random() > 0.5;
+        if (approved && currentUser) {
+          const updatedUser = { ...currentUser, isVerified: true };
+          setCurrentUser(updatedUser);
+          router.push('/(tab)/home');
+        }
+        setStatus(approved ? 'approved' : 'rejected');
+      }, 5000);
+    }, 2000);
+  };
 
-        // Simulate admin decision after 5 seconds
-setTimeout(() => {
-    const approved = Math.random() > 0.5; // Randomly approve or reject
-    if(approved && currentUser){
-      // Update user verification status
-      const updatedUser = { ...currentUser, isVerified: true };
-      setCurrentUser(updatedUser);
-      // Navigate to home - it will show the appropriate interface based on userType
-      router.push('/(tab)/home');
-    }
-    // setStatus(approved ? 'approved' : 'rejected');
-    }, 5000); // Admin takes 5s to approve/reject
-
-    }, 2000); // Upload takes 2s
-    };
-
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.background,
+      padding: scale(20),
+      paddingTop: verticalScale(30),
+    },
+    profileRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      marginBottom: verticalScale(20),
+    },
+    avatarCircle: {
+      width: moderateScale(60),
+      height: moderateScale(60),
+      borderRadius: moderateScale(30),
+      backgroundColor: 'gold',
+      marginRight: scale(18),
+      borderColor: theme.text,
+      borderWidth: moderateScale(2),
+    },
+    nameButton: {
+      paddingHorizontal: scale(70),
+      paddingVertical: verticalScale(10),
+      borderRadius: moderateScale(20),
+      borderWidth: 1,
+      borderColor: theme.border,
+      backgroundColor: theme.card,
+    },
+    name: {
+      fontWeight: 'bold',
+      color: theme.text,
+    },
+    plot: {
+      fontWeight: 'bold',
+      color: theme.text,
+    },
+    instruction: {
+      fontSize: moderateScale(18),
+      color: theme.text,
+      marginBottom: verticalScale(30),
+    },
+    dropdown: {
+      backgroundColor: theme.card,
+      padding: moderateScale(12),
+      borderRadius: moderateScale(10),
+      marginBottom: verticalScale(20),
+      borderColor: theme.border,
+      borderWidth: 1,
+      color: theme.text,
+    },
+    uploadBox: {
+      backgroundColor: theme.card,
+      padding: moderateScale(20),
+      height: verticalScale(130),
+      borderColor: theme.border,
+      borderWidth: 1,
+      borderRadius: moderateScale(10),
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: verticalScale(20),
+    },
+    uploadText: {
+      color: theme.text,
+    },
+    statusText: {
+      marginTop: verticalScale(20),
+      textAlign: 'center',
+      fontWeight: 'bold',
+    },
+  });
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="rgba(6, 7, 7, 1)" />
-      {/* Profile row */}
+      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} backgroundColor={theme.background} />
       <View style={styles.profileRow}>
         <View style={styles.avatarCircle} />
         <TouchableOpacity style={styles.nameButton}>
           <Text style={styles.name}>{currentUser?.name || 'User'}</Text>
           <Text style={styles.plot}>{currentUser?.plotNumber || 'N/A'}</Text>
         </TouchableOpacity>
-        <TouchableOpacity  >
-            <MaterialIcons name="settings" size={50} color="black"  style={{marginLeft: 25,}} />
+        <TouchableOpacity onPress={() => router.push('/settings')}>
+          <MaterialIcons name="settings" size={moderateScale(50)} color={theme.text} style={{ marginLeft: scale(25) }} />
         </TouchableOpacity>
       </View>
 
       <Text style={styles.instruction}>To complete the profile upload Any government issued ID</Text>
 
-      {/* Dropdown simulation */}
       <RNPickerSelect
         onValueChange={(value) => setDocumentType(value)}
         items={documentTypes}
@@ -83,135 +149,28 @@ setTimeout(() => {
         }}
         value={documentType}
       />
-      
 
-      {/* Upload box */}
       <TouchableOpacity style={styles.uploadBox} onPress={handleUpload}>
         <Text style={styles.uploadText}>{selectedFile ? selectedFile.name : 'upload'}</Text>
       </TouchableOpacity>
 
-      {/* Submit button */}
-      <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
-        <Text style={styles.submitText}>submit</Text>
-        {status === 'submitting' && (
-        <Text style={{ marginTop: 20, textAlign: 'center', color: 'orange' }}>
-            Submitting your ID...
-        </Text>
-        )}
-        {status === 'waiting' && (
-        <Text style={{ marginTop: 20, textAlign: 'center', color: 'blue' }}>
-            Waiting for admin approval...
-        </Text>
-        )}
+      <Button title="Submit" onPress={handleSubmit} loading={status === 'submitting'} />
 
-        {status === 'approved' && (
-        <Text style={{ marginTop: 20, textAlign: 'center', color: 'green', fontWeight: 'bold' }}>
-            ✅ Approved! Your profile is verified.
+      {status === 'waiting' && (
+        <Text style={[styles.statusText, { color: 'blue' }]}>
+          Waiting for admin approval...
         </Text>
-        )}
-
-        {status === 'rejected' && (
-        <Text style={{ marginTop: 20, textAlign: 'center', color: 'red', fontWeight: 'bold' }}>
-            ❌ Rejected. Please upload a valid ID.
+      )}
+      {status === 'approved' && (
+        <Text style={[styles.statusText, { color: 'green' }]}>
+          ✅ Approved! Your profile is verified.
         </Text>
-        )}
-
-      </TouchableOpacity>
+      )}
+      {status === 'rejected' && (
+        <Text style={[styles.statusText, { color: 'red' }]}>
+          ❌ Rejected. Please upload a valid ID.
+        </Text>
+      )}
     </View>
   );
-} 
-
-
-// Styles
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f9f9f9ff',
-    padding: 20,
-    paddingTop: 30, // add top space to avoid notch
-  },
-
-  profileRow: {
-    
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 20,
-    marginTop: 0, // ensures it starts from top
-  },
-
-  avatarCircle: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: 'gold',
-    marginRight: 18,
-    borderBlockColor: 'black',
-    borderWidth: 2,
-  },
-  boxSetting: {
-    width: 60,
-    height: 60,
-    borderRadius: 9,
-    backgroundColor: 'grey',
-    marginLeft: 10,
-    borderBlockColor: 'black',
-    borderWidth: 2,
-    },
-  nameButton: {
-    paddingHorizontal: 70,
-    paddingVertical: 10,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: 'black',
-    backgroundColor: 'white',
-  },
-  name: {
-    fontWeight: 'bold',
-    color: 'black',
-  },
-  plot: {
-    fontWeight: 'bold',
-    color: 'black',
-  },
-  instruction: {
-    fontSize: 18,
-    color: 'black',
-    marginBottom: 30,
-  },
-  dropdown: {
-    backgroundColor: 'white',
-    padding: 12,
-    borderRadius: 10,
-    marginBottom: 20,
-    borderColor: 'black',
-    borderWidth: 1,
-  },
-  uploadBox: {
-    backgroundColor: 'white',
-    padding: 20,
-    height: 130,
-    borderColor: 'black',
-    borderWidth: 1,
-    borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 20,
-  },
-  uploadText: {
-    color: 'black',
-  },
-  submitButton: {
-    backgroundColor: 'white',
-    paddingVertical: 14,
-    alignItems: 'center',
-    borderRadius: 30,
-    borderColor: 'black',
-    borderWidth: 1,
-  },
-  submitText: {
-    color: 'black',
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
-});
+}
