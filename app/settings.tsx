@@ -1,7 +1,6 @@
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useRouter } from 'expo-router';
-import React from 'react';
-import { Alert, StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { moderateScale, scale, verticalScale } from '../lib/scaling';
 import { useTheme } from '../lib/themeContext';
 import { useUser } from '../lib/userContext';
@@ -9,7 +8,7 @@ import { useUser } from '../lib/userContext';
 export default function ResidentSettingsScreen() {
   const router = useRouter();
   const { currentUser, setCurrentUser } = useUser();
-  const { theme, toggleTheme, isDarkMode } = useTheme();
+  const { theme, themeMode } = useTheme();
 
   const handleLogout = () => {
     Alert.alert(
@@ -34,6 +33,23 @@ export default function ResidentSettingsScreen() {
 
   const handleVehicleManagement = () => {
     router.push('/vehicle-management');
+  };
+
+  const handleThemeSettings = () => {
+    router.push('/theme-settings');
+  };
+
+  const getThemeDisplayText = () => {
+    switch (themeMode) {
+      case 'light':
+        return 'Light Theme';
+      case 'dark':
+        return 'Dark Theme';
+      case 'system':
+        return 'System Theme';
+      default:
+        return 'System Theme';
+    }
   };
 
   const styles = StyleSheet.create({
@@ -98,6 +114,13 @@ export default function ResidentSettingsScreen() {
       fontSize: moderateScale(18),
       color: theme.text,
       fontWeight: '500',
+      flex: 1,
+    },
+    settingsValue: {
+      fontSize: moderateScale(16),
+      color: theme.text,
+      opacity: 0.7,
+      marginRight: scale(10),
     },
     positionCard: {
       backgroundColor: theme.card,
@@ -133,17 +156,13 @@ export default function ResidentSettingsScreen() {
 
       {/* Settings Options */}
       <View style={styles.settingsList}>
-        <View style={styles.settingsItem}>
+        <TouchableOpacity style={styles.settingsItem} onPress={handleThemeSettings}>
           <MaterialIcons name="brightness-6" size={moderateScale(28)} color="#39AEE4" style={styles.icon} />
-          <Text style={styles.settingsText}>Dark Mode</Text>
-          <Switch
-            value={isDarkMode}
-            onValueChange={toggleTheme}
-            trackColor={{ false: "#767577", true: "#81b0ff" }}
-            thumbColor={isDarkMode ? "#f5dd4b" : "#f4f3f4"}
-            style={{ marginLeft: 'auto' }}
-          />
-        </View>
+          <Text style={styles.settingsText}>Theme</Text>
+          <Text style={styles.settingsValue}>{getThemeDisplayText()}</Text>
+          <MaterialIcons name="chevron-right" size={moderateScale(24)} color={theme.text} />
+        </TouchableOpacity>
+        
         {currentUser?.userType === 'resident' && (
           <>
             <TouchableOpacity style={styles.settingsItem}>

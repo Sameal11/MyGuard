@@ -16,8 +16,10 @@ function AppLayout() {
       <Stack.Screen name="index" options={{ headerShown: false }} />
       <Stack.Screen name="(tab)" options={{ headerShown: false }} />
       <Stack.Screen name="auth" options={{ title: "Login" }} />
+      <Stack.Screen name="otp-verification" options={{ title: "OTP Verification", headerShown: false }} />
       <Stack.Screen name="verification" options={{ title: "Verification" }} />
       <Stack.Screen name="settings" options={{ title: "Settings" }} />
+      <Stack.Screen name="theme-settings" options={{ title: "Theme Settings" }} />
       <Stack.Screen
         name="pre-approve-visitor"
         options={{ headerShown: false }}

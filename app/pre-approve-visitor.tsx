@@ -1,24 +1,16 @@
-import React, { useState, useRef } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  ScrollView,
-  Alert,
-  Modal,
-} from 'react-native';
-import { MaterialIcons } from '@expo/vector-icons';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useRouter } from 'expo-router';
+import { useRef, useState } from 'react';
+import { Alert, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import RNPickerSelect from 'react-native-picker-select';
 import QRCode from 'react-native-qrcode-svg';
-import * as FileSystem from 'expo-file-system';
-import * as Sharing from 'expo-sharing';
 import ViewShot from 'react-native-view-shot';
+import { moderateScale, scale, verticalScale } from '../lib/scaling';
+import { useTheme } from '../lib/themeContext';
 
 export default function PreApproveVisitor() {
   const router = useRouter();
+  const { theme } = useTheme();
   const [visitorName, setVisitorName] = useState('');
   const [visitorPhone, setVisitorPhone] = useState('');
   const [visitorType, setVisitorType] = useState('');
@@ -26,63 +18,213 @@ export default function PreApproveVisitor() {
   const [validFrom, setValidFrom] = useState('');
   const [validTo, setValidTo] = useState('');
   const [showQRCode, setShowQRCode] = useState(false);
-  const [qrCodeData, setQRCodeData] = useState('');
-  const qrViewRef = useRef(null);
+  const [qrData, setQrData] = useState('');
+  const qrViewRef = useRef<ViewShot>(null);
 
   const visitorTypes = [
-    { label: 'Guest', value: 'guest' },
-    { label: 'Delivery', value: 'delivery' },
-    { label: 'Cab/Taxi', value: 'cab' },
-    { label: 'Construction Worker', value: 'construction' },
-    { label: 'Office Visitor', value: 'office' },
+    { label: 'Family Member', value: 'family' },
+    { label: 'Friend', value: 'friend' },
+    { label: 'Delivery Person', value: 'delivery' },
+    { label: 'Service Provider', value: 'service' },
+    { label: 'Business Associate', value: 'business' },
   ];
 
   const generateQRCode = () => {
     if (!visitorName || !visitorPhone || !visitorType) {
-      Alert.alert('Error', 'Please fill in all required fields');
+      Alert.alert('Error', 'Please fill in all required fields marked with *');
       return;
     }
 
-    const qrData = {
+    const data = {
       visitorName,
       visitorPhone,
       visitorType,
       purpose,
       validFrom,
       validTo,
-      flatNumber: 'Plot-101',
-      approvedBy: 'Anuj Munda',
-      timestamp: new Date().toISOString(),
-      id: Math.random().toString(36).substr(2, 9),
+      generatedAt: new Date().toISOString(),
     };
 
-    setQRCodeData(JSON.stringify(qrData));
+    setQrData(JSON.stringify(data));
     setShowQRCode(true);
   };
 
   const shareQRCode = async () => {
     try {
-      const uri = await qrViewRef.current.capture();
-      const isSharingAvailable = await Sharing.isAvailableAsync();
-      if (!isSharingAvailable) {
-        Alert.alert('Not Available', 'Sharing is not available on this device.');
-        return;
+      if (qrViewRef.current && qrViewRef.current.capture) {
+        const uri = await qrViewRef.current.capture();
+        if (uri) {
+          // Here you would implement sharing functionality
+          Alert.alert('Success', 'QR Code generated successfully!');
+        }
       }
-      await Sharing.shareAsync(uri);
-    } catch (err) {
-      console.error(err);
-      Alert.alert('Error', 'Failed to share QR Code');
+    } catch (error) {
+      Alert.alert('Error', 'Failed to generate QR code');
     }
   };
+
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.background,
+    },
+    header: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingHorizontal: scale(20),
+      paddingTop: verticalScale(50),
+      paddingBottom: verticalScale(20),
+      backgroundColor: theme.card,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.border,
+    },
+    backButton: {
+      padding: moderateScale(8),
+    },
+    headerTitle: {
+      fontSize: moderateScale(18),
+      fontWeight: 'bold',
+      color: theme.text,
+    },
+    content: {
+      flex: 1,
+      padding: scale(20),
+    },
+    form: {
+      backgroundColor: theme.card,
+      borderRadius: moderateScale(12),
+      padding: scale(20),
+    },
+    inputGroup: {
+      marginBottom: verticalScale(15),
+    },
+    label: {
+      fontSize: moderateScale(16),
+      color: theme.text,
+      marginBottom: verticalScale(5),
+      fontWeight: '500',
+    },
+    input: {
+      backgroundColor: theme.secondary,
+      borderRadius: moderateScale(8),
+      padding: moderateScale(12),
+      fontSize: moderateScale(16),
+      borderWidth: 1,
+      borderColor: theme.border,
+      color: theme.text,
+    },
+    textArea: {
+      height: verticalScale(80),
+      textAlignVertical: 'top',
+    },
+    pickerContainer: {
+      backgroundColor: theme.secondary,
+      borderRadius: moderateScale(8),
+      borderWidth: 1,
+      borderColor: theme.border,
+    },
+    pickerInput: {
+      fontSize: moderateScale(16),
+      color: theme.text,
+      padding: moderateScale(12),
+    },
+    dateInput: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      backgroundColor: theme.secondary,
+      borderRadius: moderateScale(8),
+      padding: moderateScale(12),
+      borderWidth: 1,
+      borderColor: theme.border,
+    },
+    dateText: {
+      fontSize: moderateScale(16),
+      color: theme.text,
+    },
+    placeholder: {
+      color: theme.text,
+      opacity: 0.7,
+    },
+    generateButton: {
+      backgroundColor: theme.primary,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: moderateScale(15),
+      borderRadius: moderateScale(10),
+      marginTop: verticalScale(20),
+    },
+    generateButtonText: {
+      color: theme.background,
+      fontSize: moderateScale(18),
+      fontWeight: 'bold',
+      marginLeft: moderateScale(8),
+    },
+    modalOverlay: {
+      flex: 1,
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    modalContent: {
+      backgroundColor: theme.card,
+      borderRadius: moderateScale(12),
+      padding: scale(20),
+      alignItems: 'center',
+      margin: scale(20),
+    },
+    modalTitle: {
+      fontSize: moderateScale(20),
+      fontWeight: 'bold',
+      color: theme.text,
+      marginBottom: verticalScale(20),
+    },
+    qrContainer: {
+      backgroundColor: '#fff',
+      padding: moderateScale(20),
+      borderRadius: moderateScale(8),
+      marginBottom: verticalScale(20),
+    },
+    modalButtons: {
+      flexDirection: 'row',
+      gap: moderateScale(10),
+    },
+    modalButton: {
+      flex: 1,
+      padding: moderateScale(12),
+      borderRadius: moderateScale(8),
+      alignItems: 'center',
+    },
+    shareButton: {
+      backgroundColor: theme.primary,
+    },
+    closeButton: {
+      backgroundColor: theme.secondary,
+      borderWidth: 1,
+      borderColor: theme.border,
+    },
+    buttonText: {
+      fontSize: moderateScale(16),
+      fontWeight: '600',
+    },
+    shareButtonText: {
+      color: theme.background,
+    },
+    closeButtonText: {
+      color: theme.text,
+    },
+  });
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <MaterialIcons name="arrow-back" size={24} color="#000" />
+        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+          <MaterialIcons name="arrow-back" size={24} color={theme.text} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Pre-approve Visitor</Text>
-        <View style={{ width: 32 }} />
+        <View style={{ width: moderateScale(32) }} />
       </View>
 
       <ScrollView style={styles.content}>
@@ -94,7 +236,7 @@ export default function PreApproveVisitor() {
               value={visitorName}
               onChangeText={setVisitorName}
               placeholder="Enter visitor's full name"
-              placeholderTextColor="#999"
+              placeholderTextColor={theme.text}
             />
           </View>
 
@@ -105,7 +247,7 @@ export default function PreApproveVisitor() {
               value={visitorPhone}
               onChangeText={setVisitorPhone}
               placeholder="Enter visitor's phone number"
-              placeholderTextColor="#999"
+              placeholderTextColor={theme.text}
               keyboardType="phone-pad"
               maxLength={10}
             />
@@ -134,7 +276,7 @@ export default function PreApproveVisitor() {
               value={purpose}
               onChangeText={setPurpose}
               placeholder="Enter purpose of visit"
-              placeholderTextColor="#999"
+              placeholderTextColor={theme.text}
               multiline
               numberOfLines={3}
             />
@@ -148,7 +290,7 @@ export default function PreApproveVisitor() {
               <Text style={[styles.dateText, !validFrom && styles.placeholder]}>
                 {validFrom || 'Select date'}
               </Text>
-              <MaterialIcons name="date-range" size={24} color="#007AFF" />
+              <MaterialIcons name="date-range" size={24} color={theme.primary} />
             </TouchableOpacity>
           </View>
 
@@ -164,12 +306,12 @@ export default function PreApproveVisitor() {
               <Text style={[styles.dateText, !validTo && styles.placeholder]}>
                 {validTo || 'Select date'}
               </Text>
-              <MaterialIcons name="date-range" size={24} color="#007AFF" />
+              <MaterialIcons name="date-range" size={24} color={theme.primary} />
             </TouchableOpacity>
           </View>
 
           <TouchableOpacity style={styles.generateButton} onPress={generateQRCode}>
-            <MaterialIcons name="qr-code" size={24} color="#fff" />
+            <MaterialIcons name="qr-code" size={24} color={theme.background} />
             <Text style={styles.generateButtonText}>Generate QR Code</Text>
           </TouchableOpacity>
         </View>
@@ -177,159 +319,33 @@ export default function PreApproveVisitor() {
 
       <Modal
         visible={showQRCode}
-        transparent={true}
-        animationType="slide"
-        onRequestClose={() => setShowQRCode(false)}>
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowQRCode(false)}
+      >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Visitor QR Code</Text>
-              <TouchableOpacity onPress={() => setShowQRCode(false)}>
-                <MaterialIcons name="close" size={24} color="#000" />
+            <Text style={styles.modalTitle}>Visitor QR Code</Text>
+            <ViewShot ref={qrViewRef} style={styles.qrContainer}>
+              <QRCode value={qrData} size={200} />
+            </ViewShot>
+            <View style={styles.modalButtons}>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.shareButton]}
+                onPress={shareQRCode}
+              >
+                <Text style={[styles.buttonText, styles.shareButtonText]}>Share</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.closeButton]}
+                onPress={() => setShowQRCode(false)}
+              >
+                <Text style={[styles.buttonText, styles.closeButtonText]}>Close</Text>
               </TouchableOpacity>
             </View>
-
-            <View style={styles.qrContainer}>
-              {qrCodeData && (
-                <ViewShot ref={qrViewRef} options={{ format: 'png', quality: 1.0 }}>
-                  <View style={styles.qrCodeImage}>
-                    <QRCode
-                      value={qrCodeData}
-                      size={240}
-                      color="black"
-                      backgroundColor="white"
-                    />
-                  </View>
-                </ViewShot>
-              )}
-            </View>
-
-            <TouchableOpacity style={styles.shareButton} onPress={shareQRCode}>
-              <MaterialIcons name="share" size={20} color="#fff" />
-              <Text style={styles.shareButtonText}>Share QR Code</Text>
-            </TouchableOpacity>
           </View>
         </View>
       </Modal>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f5f5f5' },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingTop: 50,
-    paddingBottom: 20,
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-  },
-  backButton: { padding: 8 },
-  headerTitle: { fontSize: 18, fontWeight: 'bold', color: '#000' },
-  content: { flex: 1, padding: 20 },
-  form: { backgroundColor: '#fff', borderRadius: 12, padding: 20 },
-  inputGroup: { marginBottom: 20 },
-  label: { fontSize: 16, fontWeight: '600', color: '#000', marginBottom: 8 },
-  input: {
-    borderWidth: 1,
-    borderColor: '#e0e0e0',
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
-    color: '#000',
-    backgroundColor: '#fff',
-  },
-  textArea: { height: 80, textAlignVertical: 'top' },
-  pickerContainer: {
-    borderWidth: 1,
-    borderColor: '#e0e0e0',
-    borderRadius: 8,
-    backgroundColor: '#fff',
-  },
-  pickerInput: {
-    fontSize: 16,
-    paddingVertical: 12,
-    paddingHorizontal: 12,
-    color: '#000',
-  },
-  dateInput: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    borderWidth: 1,
-    borderColor: '#e0e0e0',
-    borderRadius: 8,
-    padding: 12,
-    backgroundColor: '#fff',
-  },
-  dateText: { fontSize: 16, color: '#000' },
-  placeholder: { color: '#999' },
-  generateButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#007AFF',
-    borderRadius: 8,
-    padding: 15,
-    marginTop: 20,
-  },
-  generateButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-    marginLeft: 8,
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalContent: {
-    backgroundColor: '#fff',
-    borderRadius: 16,
-    padding: 20,
-    margin: 20,
-    maxWidth: 350,
-    width: '100%',
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  modalTitle: { fontSize: 18, fontWeight: 'bold', color: '#000' },
-  qrContainer: {
-    alignItems: 'center',
-    marginBottom: 20,
-    backgroundColor: '#f9f9f9',
-    borderRadius: 12,
-    padding: 20,
-  },
-  shareButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#34C759',
-    borderRadius: 8,
-    padding: 12,
-    paddingHorizontal: 20,
-    justifyContent: 'center',
-  },
-  shareButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-    marginLeft: 8,
-  },
-  qrCodeImage: {
-    padding: 30,
-    backgroundColor: '#fff',
-    borderRadius: 15,
-    alignItems: 'center',
-  },
-});

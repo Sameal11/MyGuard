@@ -1,47 +1,149 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, Alert } from 'react-native';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useRouter } from 'expo-router';
+import { useState } from 'react';
+import { Alert, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { moderateScale, scale, verticalScale } from '../lib/scaling';
+import { useTheme } from '../lib/themeContext';
 
 export default function ConstructionEntryScreen() {
   const router = useRouter();
-  const [entryType, setEntryType] = useState('worker'); // Choose between worker and vehicle
-
-  // Worker-related states
+  const { theme } = useTheme();
+  const [entryType, setEntryType] = useState<'entry' | 'exit'>('entry');
   const [workerName, setWorkerName] = useState('');
-  const [company, setCompany] = useState('');
-  const [idProof, setIdProof] = useState('');
-  const [project, setProject] = useState('');
-
-  // Vehicle-related states
+  const [workerPhone, setWorkerPhone] = useState('');
+  const [contractorName, setContractorName] = useState('');
+  const [workLocation, setWorkLocation] = useState('');
+  const [workType, setWorkType] = useState('');
   const [vehicleNumber, setVehicleNumber] = useState('');
-  const [driverName, setDriverName] = useState('');
-  const [vehicleType, setVehicleType] = useState('');
+  const [equipmentDetails, setEquipmentDetails] = useState('');
 
   const handleSubmit = () => {
-    if (entryType === 'worker' && (!workerName || !company || !project)) {
-      Alert.alert('Error', 'Please fill in all required fields for worker');
+    if (!workerName || !workerPhone || !workLocation) {
+      Alert.alert('Error', 'Please fill in all required fields marked with *');
       return;
     }
 
-    if (entryType === 'vehicle' && (!vehicleNumber || !driverName)) {
-      Alert.alert('Error', 'Please fill in all required fields for vehicle');
-      return;
-    }
-
-    const message = entryType === 'worker'
-      ? `Worker ${workerName} from ${company} has been logged successfully.`
-      : `Vehicle ${vehicleNumber} driven by ${driverName} has been logged successfully.`;
-
-    Alert.alert('Entry Logged', message, [{ text: 'OK', onPress: () => router.back() }]);
+    Alert.alert(
+      'Success',
+      `${entryType === 'entry' ? 'Entry' : 'Exit'} logged successfully`,
+      [
+        {
+          text: 'OK',
+          onPress: () => router.back(),
+        },
+      ]
+    );
   };
+
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.background,
+    },
+    header: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingHorizontal: scale(20),
+      paddingTop: verticalScale(50),
+      paddingBottom: verticalScale(20),
+      backgroundColor: theme.card,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.border,
+    },
+    backButton: {
+      padding: moderateScale(8),
+    },
+    headerTitle: {
+      fontSize: moderateScale(18),
+      fontWeight: 'bold',
+      color: theme.text,
+    },
+    placeholder: {
+      width: moderateScale(40),
+    },
+    content: {
+      flex: 1,
+      padding: scale(20),
+    },
+    form: {
+      backgroundColor: theme.card,
+      borderRadius: moderateScale(12),
+      padding: scale(20),
+    },
+    sectionTitle: {
+      fontSize: moderateScale(18),
+      fontWeight: 'bold',
+      color: theme.text,
+      marginBottom: verticalScale(15),
+      marginTop: verticalScale(10),
+    },
+    buttonGroup: {
+      flexDirection: 'row',
+      marginBottom: verticalScale(20),
+    },
+    typeButton: {
+      flex: 1,
+      padding: moderateScale(12),
+      borderRadius: moderateScale(8),
+      borderWidth: 2,
+      borderColor: theme.border,
+      backgroundColor: theme.secondary,
+      alignItems: 'center',
+      marginHorizontal: moderateScale(5),
+    },
+    activeButton: {
+      borderColor: theme.primary,
+      backgroundColor: theme.primary,
+    },
+    typeText: {
+      fontSize: moderateScale(16),
+      fontWeight: '500',
+      color: theme.text,
+    },
+    activeText: {
+      color: theme.background,
+    },
+    inputGroup: {
+      marginBottom: verticalScale(15),
+    },
+    label: {
+      fontSize: moderateScale(16),
+      color: theme.text,
+      marginBottom: verticalScale(5),
+      fontWeight: '500',
+    },
+    input: {
+      backgroundColor: theme.secondary,
+      borderRadius: moderateScale(8),
+      padding: moderateScale(12),
+      fontSize: moderateScale(16),
+      borderWidth: 1,
+      borderColor: theme.border,
+      color: theme.text,
+    },
+    submitButton: {
+      backgroundColor: theme.primary,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: moderateScale(15),
+      borderRadius: moderateScale(10),
+      marginTop: verticalScale(20),
+    },
+    submitText: {
+      color: theme.background,
+      fontSize: moderateScale(18),
+      fontWeight: 'bold',
+      marginLeft: moderateScale(8),
+    },
+  });
 
   return (
     <View style={styles.container}>
-      {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <MaterialIcons name="arrow-back" size={24} color="#000" />
+        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+          <MaterialIcons name="arrow-back" size={24} color={theme.text} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Construction Entry</Text>
         <View style={styles.placeholder} />
@@ -49,107 +151,111 @@ export default function ConstructionEntryScreen() {
 
       <ScrollView style={styles.content}>
         <View style={styles.form}>
-          {/* Entry Type */}
-          <Text style={styles.sectionTitle}>Entry Type</Text>
           <View style={styles.buttonGroup}>
-            <TouchableOpacity 
-              style={[styles.typeButton, entryType === 'worker' && styles.activeButton]}
-              onPress={() => setEntryType('worker')}
+            <TouchableOpacity
+              style={[styles.typeButton, entryType === 'entry' && styles.activeButton]}
+              onPress={() => setEntryType('entry')}
             >
-              <Text style={[styles.typeText, entryType === 'worker' && styles.activeText]}>Worker</Text>
+              <Text style={[styles.typeText, entryType === 'entry' && styles.activeText]}>
+                Entry
+              </Text>
             </TouchableOpacity>
-            <TouchableOpacity 
-              style={[styles.typeButton, entryType === 'vehicle' && styles.activeButton]}
-              onPress={() => setEntryType('vehicle')}
+            <TouchableOpacity
+              style={[styles.typeButton, entryType === 'exit' && styles.activeButton]}
+              onPress={() => setEntryType('exit')}
             >
-              <Text style={[styles.typeText, entryType === 'vehicle' && styles.activeText]}>Vehicle</Text>
+              <Text style={[styles.typeText, entryType === 'exit' && styles.activeText]}>
+                Exit
+              </Text>
             </TouchableOpacity>
           </View>
 
-          {entryType === 'worker' ? (
-            // Worker Form
-            <>
-              <Text style={styles.sectionTitle}>Worker Information</Text>
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>Worker Name *</Text>
-                <TextInput
-                  style={styles.input}
-                  value={workerName}
-                  onChangeText={setWorkerName}
-                  placeholder="Enter worker name"
-                />
-              </View>
+          <Text style={styles.sectionTitle}>Worker Information</Text>
+          
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Worker Name *</Text>
+            <TextInput
+              style={styles.input}
+              value={workerName}
+              onChangeText={setWorkerName}
+              placeholder="Enter worker name"
+              placeholderTextColor={theme.text}
+            />
+          </View>
 
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>Company *</Text>
-                <TextInput
-                  style={styles.input}
-                  value={company}
-                  onChangeText={setCompany}
-                  placeholder="Enter company name"
-                />
-              </View>
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Phone Number *</Text>
+            <TextInput
+              style={styles.input}
+              value={workerPhone}
+              onChangeText={setWorkerPhone}
+              placeholder="Enter phone number"
+              placeholderTextColor={theme.text}
+              keyboardType="phone-pad"
+            />
+          </View>
 
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>ID Proof</Text>
-                <TextInput
-                  style={styles.input}
-                  value={idProof}
-                  onChangeText={setIdProof}
-                  placeholder="e.g., Driving License, Aadhar Card"
-                />
-              </View>
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Contractor Name</Text>
+            <TextInput
+              style={styles.input}
+              value={contractorName}
+              onChangeText={setContractorName}
+              placeholder="Enter contractor name"
+              placeholderTextColor={theme.text}
+            />
+          </View>
 
-              <Text style={styles.sectionTitle}>Project Details</Text>
+          <Text style={styles.sectionTitle}>Work Details</Text>
 
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>Project Name *</Text>
-                <TextInput
-                  style={styles.input}
-                  value={project}
-                  onChangeText={setProject}
-                  placeholder="Enter project name"
-                />
-              </View>
-            </>
-          ) : (
-            // Vehicle Form
-            <>
-              <Text style={styles.sectionTitle}>Vehicle Information</Text>
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>Vehicle Number *</Text>
-                <TextInput
-                  style={styles.input}
-                  value={vehicleNumber}
-                  onChangeText={setVehicleNumber}
-                  placeholder="Enter vehicle number"
-                />
-              </View>
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Work Location *</Text>
+            <TextInput
+              style={styles.input}
+              value={workLocation}
+              onChangeText={setWorkLocation}
+              placeholder="e.g., Building A, Floor 3, Flat 301"
+              placeholderTextColor={theme.text}
+            />
+          </View>
 
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>Driver Name *</Text>
-                <TextInput
-                  style={styles.input}
-                  value={driverName}
-                  onChangeText={setDriverName}
-                  placeholder="Enter driver name"
-                />
-              </View>
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Type of Work</Text>
+            <TextInput
+              style={styles.input}
+              value={workType}
+              onChangeText={setWorkType}
+              placeholder="e.g., Plumbing, Electrical, Painting"
+              placeholderTextColor={theme.text}
+            />
+          </View>
 
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>Vehicle Type</Text>
-                <TextInput
-                  style={styles.input}
-                  value={vehicleType}
-                  onChangeText={setVehicleType}
-                  placeholder="e.g., Truck, Crane"
-                />
-              </View>
-            </>
-          )}
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Vehicle Number</Text>
+            <TextInput
+              style={styles.input}
+              value={vehicleNumber}
+              onChangeText={setVehicleNumber}
+              placeholder="Enter vehicle number if applicable"
+              placeholderTextColor={theme.text}
+              autoCapitalize="characters"
+            />
+          </View>
+
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Equipment Details</Text>
+            <TextInput
+              style={styles.input}
+              value={equipmentDetails}
+              onChangeText={setEquipmentDetails}
+              placeholder="List of equipment/tools being carried"
+              placeholderTextColor={theme.text}
+              multiline
+            />
+          </View>
 
           <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
-            <MaterialIcons name="check" size={24} color="#fff" />
+            <MaterialIcons name="check" size={24} color={theme.background} />
             <Text style={styles.submitText}>Log Entry</Text>
           </TouchableOpacity>
         </View>
@@ -157,103 +263,4 @@ export default function ConstructionEntryScreen() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingTop: 50,
-    paddingBottom: 20,
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-  },
-  backButton: {
-    padding: 8,
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#000',
-  },
-  placeholder: {
-    width: 40,
-  },
-  content: {
-    flex: 1,
-    padding: 20,
-  },
-  form: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 20,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#000',
-    marginBottom: 15,
-    marginTop: 10,
-  },
-  buttonGroup: {
-    flexDirection: 'row',
-    marginBottom: 20,
-  },
-  typeButton: {
-    flex: 1,
-    padding: 12,
-    borderRadius: 8,
-    backgroundColor: '#eee',
-    alignItems: 'center',
-    marginHorizontal: 5,
-  },
-  activeButton: {
-    backgroundColor: '#007BFF',
-  },
-  typeText: {
-    fontSize: 16,
-    color: '#555',
-  },
-  activeText: {
-    color: '#fff',
-  },
-  inputGroup: {
-    marginBottom: 15,
-  },
-  label: {
-    fontSize: 16,
-    color: '#333',
-    marginBottom: 5,
-    fontWeight: '500',
-  },
-  input: {
-    backgroundColor: '#f8f8f8',
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
-    borderWidth: 1,
-    borderColor: '#e0e0e0',
-  },
-  submitButton: {
-    backgroundColor: '#FF5722',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 15,
-    borderRadius: 10,
-    marginTop: 20,
-  },
-  submitText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginLeft: 8,
-  },
-});
 
