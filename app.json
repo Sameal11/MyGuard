@@ -16,8 +16,16 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "permissions": ["READ_EXTERNAL_STORAGE", "WRITE_EXTERNAL_STORAGE"],
-      "edgeToEdgeEnabled": true
+      "permissions": [
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE",
+        "android.permission.CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE",
+        "android.permission.CAMERA"
+      ],
+      "edgeToEdgeEnabled": true,
+      "package": "com.grimalkin20.MyGuard"
     },
     "web": {
       "bundler": "metro",
@@ -39,6 +47,12 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "2494c2e0-67bd-4a36-bcb1-843f8779e175"
+      }
     }
   }
 }
